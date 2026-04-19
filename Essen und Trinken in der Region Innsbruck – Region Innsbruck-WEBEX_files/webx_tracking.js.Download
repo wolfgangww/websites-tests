@@ -1,0 +1,108 @@
+/* Tracking */
+
+// search button
+jQuery(".tx-webx-bookingemo .submitsearch").click(function(){
+    ga("send", "event", "Buchungsstrecke Suche", "Klick Unterkunft Finden", 1);
+});
+
+jQuery(".tx-webx-bookingemo.quickbooking form ").submit(function(){
+    ga("send", "event", "Suchen-Buchen-Leiste", "Klick Unterkunft Finden", 1);
+});
+
+
+
+jQuery("#c3484 a.download").submit(function(){
+    ga("send", "event", "Tanzfest Programm", "Klick Programm", 1);
+});
+
+
+jQuery("#c3484 a.mail").submit(function(){
+    ga("send", "event", "Tanzfest Programm", "Klick Ticket", 1);
+});
+
+jQuery(".pauschalSliderContent a.more").submit(function(){
+    ga("send", "event", "Tanzfest Details Klick", jQuery(this).closest("h3") , 1);
+});
+
+
+
+
+/* filter */
+jQuery(".tx-webx-bookingemo .filterWrapper input").each (function() {
+    jQuery(this).click(function() {
+        try {
+            ga('send', 'event', 'Buchungsstrecke Filter', jQuery(this).data("group"), jQuery(this).data("name"));
+        } catch (e) {
+            console.log("404 - Analytics not found");
+        }
+    });
+});
+
+/* detailview */
+jQuery(".tx-webx-bookingemo .singleView .tabs .tab").each (function() {
+    jQuery(this).click(function() {
+        ga('send', 'event', jQuery.trim(jQuery(".tx-webx-bookingemo h1").html()), "Klick Tab " + jQuery(this).data("tab"));
+    });
+});
+
+jQuery(".tx-webx-bookingemo .CCTrackEMail").click(function() {
+    ga('send', 'event', 'Email', 'Klick', jQuery.trim(jQuery(".tx-webx-bookingemo h1").html()));
+});
+
+jQuery(".tx-webx-bookingemo .CCTrackPhone").click(function() {
+    ga('send', 'event', 'Telefonnummer', 'Klick', jQuery.trim(jQuery(".tx-webx-bookingemo h1").html()));
+});
+
+jQuery(".tx-webx-bookingemo .CCTrackUrl").click(function() {
+    ga('send', 'event', 'Url', 'Klick', jQuery.trim(jQuery(".tx-webx-bookingemo h1").html()));
+});
+
+/* rating */
+jQuery(".tx-webx-bookingemo .serviceProviderResults .systemTrustYou a").click(function() {
+    ga('send', 'event', 'Unterkünfte', 'Bewertungen', jQuery.trim(jQuery(this).find(".trustyou").data('name')));
+});
+jQuery(".tx-webx-bookingemo .singleView .ratings").click(function() {
+    ga('send', 'event', 'Unterkünfte', 'Bewertungen', jQuery.trim(jQuery(".tx-webx-bookingemo h1").html()));
+});
+
+
+
+
+function webxConversionTracking () {
+
+    ga('require', 'ec');
+
+    // Set tracker currency to Euros
+    ga('set', '&cu', 'EUR');
+
+
+    var items = [];
+    for (var i = 0; i < bookingdata.products.length; i++) {
+
+        var room = bookingdata.products[i];
+
+        ga("ec:addProduct", {
+            "id": room.Productname,
+            "name": room.Hotelname,
+            "price": room.TotalPrice / room.PayNights,
+            "category": room.Category,
+            "quantity": room.PayNights
+        });
+    }
+
+    ga('ec:setAction', 'purchase', {
+        'id': bookingdata.BookingNumber,
+        'affiliation': 'Booking Emo',
+        'revenue': bookingdata.PriceTotal,
+        'tax': '0',
+        'shipping': '0'
+    });
+    ga("send", "event", "checkout", "purchase");
+
+
+    return true;
+}
+
+jQuery(document).ready(function() {
+    FclickCount();
+});

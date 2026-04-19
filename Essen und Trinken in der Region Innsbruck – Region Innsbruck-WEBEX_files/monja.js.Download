@@ -1,0 +1,557 @@
+jQuery(document).ready(function() {
+    stickyDiv();
+
+    $('.toolTipp').tooltipster({
+        theme: 'tooltipster-light',
+        contentCloning: true,
+        trigger: 'click',
+        position: 'bottom'
+    });
+
+
+    if ($(window).width() > 1300) {
+        jQuery('.toolTipp').on('click touch', function(e) {
+            updateEscapeContentNew();
+        });
+    }
+
+    if ($(window).width() >= 768) {
+        if (jQuery('.route').length > 0) {
+
+            jQuery('#saddr, #daddr').on('keyup change', function() {
+                var show = 1;
+                if (jQuery('#saddr').val() == '') {
+                    show = 0;
+                }
+                if (jQuery('#daddr').val() == '') {
+                    show = 0;
+                }
+
+                switch (show) {
+                    case 1:
+						jQuery('#googleRoute .to svg').show();
+
+                        break;
+                    case 0:
+                        jQuery('#googleRoute .to svg').hide();
+                        break;
+                }
+            });
+
+
+            jQuery(".route .to svg").click(function() {
+                jQuery("#googleRoute").submit();
+            });
+        }
+    }
+
+    jQuery('.teamFilter span').on('click touch', function(e) {
+        e.preventDefault();
+        var fFilter = jQuery(this).attr('data-filterid');
+
+        jQuery('.dceTeamCat').hide();
+        jQuery('.dceTeamCat-'+fFilter).show();
+
+        jQuery('.teamFilter span').removeClass('active')
+        jQuery(this).addClass('active');
+    });
+
+    if (jQuery('.teamFilter span.active').length > 0) {
+        jQuery('.teamFilter span.active').parent().trigger("click");
+        jQuery('.teamFilter span.active').addClass('test');
+
+    }
+    jQuery('.teamFilter span.all').on('click touch', function(e) {
+        e.preventDefault();
+        jQuery('.dceTeamCat').hide();
+        jQuery('.dceTeamCatAll').show();
+    });
+
+
+
+    jQuery('.to.check').on('click touch', function() {
+        jQuery('.label').addClass('small');
+        jQuery(this).find('#saddr').addClass('active');
+        jQuery(this).find('#saddr').focus();
+    });
+
+    jQuery('.grid__item .dTTImage').on('click touch', function() {
+        jQuery('.dtMember').removeClass('active');
+        jQuery(this).prev().addClass('open');
+        jQuery(this).parent().next().addClass('active');
+        jQuery(this).parent().next().find('.closed').addClass('open');
+    });
+
+    jQuery('.grid__item .closed').on('click touch', function() {
+        jQuery(this).removeClass('open');
+        jQuery(this).parent().next().removeClass('active');
+    });
+
+    jQuery('.grid__description .closed').on('click touch', function() {
+        jQuery(this).removeClass('open');
+        jQuery(this).parent().parent().parent().removeClass('active');
+        jQuery(this).closest('.dtMember').prev().find('.dTTIInner').removeClass('active');
+    });
+
+    if ($(window).width() > 1300) {
+        jQuery('.grid__item .dTTImage').on('click touch', function() {
+            jQuery(this).find('.dTTIInner').addClass('active');
+        });
+    }
+
+    jQuery('.dceSlider').slick({
+        dots: true,
+        infinite: true,
+        speed: 1000,
+        centerMode: true,
+        variableWidth: true,
+        fade: false,
+        arrows: true,
+        slidesToShow: 1,
+        autoplay: true,
+        autoplaySpeed: 5000
+    });
+
+
+    if ($("#video").length > 0) {
+        jQuery('.dceSlider').on('afterChange', function(event, slick, currentSlide, nextSlide) {
+            jQuery('.dceSlider foreignObject').hide();
+            $("#video")[0].src = $("#video").attr('data-src');
+
+            if (jQuery('.dceSlider .slick-current foreignObject').length > 0) {
+                jQuery('.dceSlider .slick-current foreignObject').show();
+                $("#video")[0].src += "&autoplay=1";
+            }
+        });
+    }
+
+    jQuery(".contenttable").wrap("<div class='tableWrap'></div>");
+
+    jQuery('.dceSlider .slick-prev').after('<span class="replacePrev"><span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span></span>');
+    jQuery('.dceSlider .slick-prev').remove();
+    jQuery('.replacePrev').addClass('slick-prev slick-arrow');
+
+    jQuery('.dceSlider .slick-next').after('<span class="replaceNext"><span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span></span>');
+    jQuery('.dceSlider .slick-next').remove();
+    jQuery('.replaceNext').addClass('slick-next slick-arrow');
+
+    jQuery('.replaceNext').on('click touch', function() {
+        jQuery('.dceSlider').slick('slickNext');
+    });
+
+    jQuery('.replacePrev').on('click touch', function() {
+        jQuery('.dceSlider').slick('slickPrev');
+    });
+
+    setTimeout(function() {
+        svgWidth();
+    }, 50);
+
+    if ($(window).width() < 1374) {
+        mapWidthMob();
+    } else {
+        mapWidthDesktop();
+        if (Cookies.get('dceMap') != "shown") {
+            setTimeout(function() {
+                jQuery('.dTMMPWPin.first .dTMMPWPTooltip').trigger('click');
+                Cookies.set('dceMap', 'shown');
+            }, 50);
+
+            setTimeout(function() {
+                jQuery('.dTMMPWPin.first .dTMMPWPTooltip .TTClose').trigger('click');
+            }, 10000);
+        }
+    }
+
+    jQuery('.dTMMap.desktop .dTMMPWPin.first').trigger('click');
+
+    jQuery('.dceZitatInner').slick({
+        dots: true,
+        arrows: false,
+        infinite: true,
+        speed: 500,
+        autoplay: true,
+        fade: true,
+        autoplaySpeed: 5000
+    });
+
+    jQuery('.dTMMap.mob').on('click touch', function(e) {
+        $([document.documentElement, document.body]).animate({
+            scrollTop: $(".contwiseGrid").offset().top - 65
+        }, 500);
+    });
+
+    jQuery('.dTMMap.desktop').on('click touch', function(e) {
+        var curTargetClass = jQuery(e.target).attr('class');
+
+        if (curTargetClass == 'leni') {
+            jQuery('.toolTip').removeClass('act');
+            jQuery('.dTMMPWPTooltip').removeClass('act')
+            jQuery('.dTMMPWPin').removeClass('act');
+        } else {
+            // console.log('drinnen');
+            jQuery('.dTMMPWPTooltip.act').removeClass('act');
+            jQuery('.toolTip.act').removeClass('act');
+            jQuery(e.target).closest('.dTMMPWPTooltip').addClass('act');
+            jQuery(e.target).closest('.dTMMPWPin').addClass('act');
+            jQuery(e.target).closest('.dTMMPWPTooltip').find('.toolTip').addClass('act');
+        }
+    });
+
+    jQuery('.desktop .ballungsgebiet').each(function() {
+        jQuery(this).on('click touch', function(e) {
+            if (jQuery(this).find('.normal').hasClass('hide')) {
+                jQuery(this).find('.active').removeClass('open');
+                jQuery(this).find('.normal').removeClass('hide');
+            } else {
+                jQuery('.ballungsgebiet .active').removeClass('open');
+                jQuery('.ballungsgebiet .normal').removeClass('hide');
+
+                jQuery(this).find('.active').addClass('open');
+                jQuery(this).find('.normal').addClass('hide');
+            }
+        });
+    });
+
+    if (jQuery('.dTMMap').length > 0) {
+        jQuery(".desktop .ballungsgebiet").hover(
+            function() {
+                jQuery(this).find('.normal img').attr('src', jQuery(this).find('.normal').data('hover'));
+            },
+            function() {
+                jQuery(this).find('.normal img').attr('src', jQuery(this).find('.normal').data('normal'));
+            }
+        );
+
+        jQuery('.desktop .ballungsgebiet').on('click touch', function() {
+            if (jQuery(this).hasClass('act')) {
+                jQuery(this).removeClass('act');
+                jQuery(this).parent().attr('style', jQuery(this).parent().data('normal'));
+            } else {
+                jQuery(this).addClass('act');
+                jQuery(this).parent().attr('style', jQuery(this).parent().data('active') + ' z-index: 3000;');
+            }
+        });
+    }
+
+    jQuery('.TTClose').click(function(e) {
+        setTimeout("jQuery('.dTMMPWPTooltip.act').removeClass('act')", 50);
+        setTimeout("jQuery('.toolTip.act').removeClass('act')", 50);
+        $('html,body').animate({
+                scrollTop: $(".dceTopographicMap").offset().top - 63
+            },
+            'slow');
+    });
+
+    webcam();
+
+
+
+
+
+
+    jQuery('.dwiwiFeratel, .dwiwiframe').hide();
+
+
+
+jQuery('.dwiWebcam').each(function(){
+    var slide = jQuery(this)
+    slide.slick({
+        dots: false,
+        arrows: true,
+        infinite: false,
+        fade: true,
+        speed: 500,
+        autoplay: false,
+        slidesToShow: 1,
+        slidesToScroll: 1,
+        swipeToSlide: false,
+        swipe: true,
+        asNavFor: '.webcamContentNavi',
+        autoplaySpeed: 15000
+    });
+
+    slide.on('afterChange', function(event, slick, currentSlide) {
+
+         if (jQuery(this).find('.slick-current .dwiwiFeratel').length > 0) {
+            var feratelHeight = jQuery(this).find('.dwiwInner .dwiwiFeratel').height();
+            jQuery(this).find('.dwiwiFeratel iframe').height(feratelHeight);
+            var feratelWidth = jQuery(this).find('.dwiwInner .dwiwiFeratel').width();
+            var formel = (feratelHeight * 1.3548)
+            jQuery(this).find('.dwiwiFeratel iframe').width(formel);
+
+
+            setTimeout(function() {
+                jQuery('.dwiwiFeratel').show();
+            }, 300);
+         }
+
+        if (jQuery(this).find('.slick-current .dwiwiframe iframe[name="ls-player"]').length > 0) {
+            console.log('fuu')
+            var frameHeight = jQuery(this).innerHeight();
+            var frameWidth = jQuery(this).width();
+
+            var frame = (frameHeight * 1.3548)
+            console.log(frameHeight)
+            jQuery(this).find('.dwiwiframe iframe[name="ls-player"]').height(frameHeight);
+            jQuery(this).find('.dwiwiframe iframe[name="ls-player"]').width(frame);
+
+
+            setTimeout(function() {
+                jQuery('.dwiwiframe').show();
+            }, 300);
+
+        }
+
+
+    });
+});
+
+
+        if (jQuery(this).find(".dwiwInner").hasClass("slick-active")) {
+            jQuery('.dwiwiIframe').each(function() {
+                var src = jQuery(this).find('iframe').attr('src');
+                jQuery(this).find('.iframeLink').attr('data-src', src);
+
+            });
+        } else {
+
+        }
+
+
+    jQuery('.webcamContentNavi').slick({
+        dots: false,
+        arrows: true,
+        infinite: false,
+        speed: 500,
+        autoplay: false,
+        slidesToShow: 6,
+        slidesToScroll: 1,
+        asNavFor: '.dwiWebcam',
+        focusOnSelect: true
+    });
+
+
+    var webcamSelect = jQuery(".webcamSelect");
+
+    webcamSelect.chosen({
+        disable_search: true
+    });
+
+    webcamSelect.chosen().change(function() {
+        jQuery('.dwiWebcam').slick('slickGoTo', webcamSelect.prop('selectedIndex'));
+    });
+
+    parallaxHeight();
+
+
+    jQuery('.dceAcc').on('click touch', function() {
+        if (jQuery(this).hasClass('open')) {
+            jQuery(this).removeClass('open');
+        } else {
+            jQuery(this).addClass('open')
+        }
+        if (jQuery(this).closest('.accTop').next().hasClass('open')) {
+            jQuery(this).closest('.accTop').next().removeClass('open');
+        } else {
+            jQuery(this).closest('.accTop').next().addClass('open')
+        }
+    });
+
+});
+
+var resizeTimer;
+
+jQuery(window).resize(function() {
+    clearTimeout(resizeTimer);
+
+    var width = jQuery('.dceWebcam').width();
+    jQuery('.dceWebcam .chosen-container').width(width);
+
+    parallaxHeight();
+    svgWidth();
+
+
+});
+
+jQuery(window).scroll(function() {
+    stickyDiv();
+});
+jQuery(window).resize(function() {
+    stickyDiv();
+});
+
+function stickyDiv() {
+	/*
+    if (jQuery('.welcomeCardContent').length > 0) {
+
+        if (jQuery(window).width() > 1023) {
+            fixHeight = jQuery('.welcomeCardContent').offset().top;
+            dceHeight = jQuery('.welcome_card').height();
+
+            if (jQuery(window).scrollTop() > 0 && jQuery(window).scrollTop() > fixHeight) {
+                jQuery('.fixBar').addClass('sticky');
+            }
+            if (jQuery(window).scrollTop() > (fixHeight + dceHeight)) {
+                jQuery('.fixBar').removeClass('sticky');
+            }
+            if (jQuery(window).scrollTop() < (fixHeight)) {
+                jQuery('.fixBar').removeClass('sticky');
+            }
+
+        }
+    }
+	*/
+}
+
+function GetIEVersion() {
+    var sAgent = window.navigator.userAgent;
+    var Idx = sAgent.indexOf("MSIE");
+
+    // If IE, return version number.
+    if (Idx > 0)
+        return parseInt(sAgent.substring(Idx + 5, sAgent.indexOf(".", Idx)));
+
+    // If IE 11 then look for Updated user agent string.
+    else if (!!navigator.userAgent.match(/Trident\/7\./))
+        return 11;
+
+    else
+        return 0; //It is not IE
+}
+
+
+
+function webcam() {
+    // setTimeout(function() {
+    // jQuery('.dwiwiJs').each(function() {
+    // var webcam = jQuery(this).prev('.lazyLoadWebcam').attr('data-webcam');
+    // jQuery(this).find('.webcamJs').html(webcam);
+    // });
+    // }, 50);
+    jQuery('.dwiwiIframe').each(function() {
+        var webcam = jQuery(this).prev('.lazyLoadWebcam').attr('data-webcam');
+        jQuery(this).find('.readyWebcam').html(webcam);
+
+    });
+
+    jQuery('.dwiwiFeratel').each(function() {
+        var webcam = jQuery(this).prev('.lazyLoadWebcam').attr('data-webcam');
+        jQuery(this).find('iframe').attr('src', webcam);
+
+    });
+
+
+}
+
+function parallaxHeight() {
+    /* entfernt für designpolizei #5
+    var parallaxHeight = jQuery('.dceParallaxSlider .dTSImagewrap').height();
+    jQuery('.dceParallaxSlider .dTSImg').height(parallaxHeight);
+	*/
+}
+
+function svgWidth() {
+    var svgWidth = jQuery('.dceZitatInner').width();
+    jQuery('.zitatSvgWrap').width(svgWidth);
+}
+
+
+function mapWidthMob() {
+    var width = jQuery('.dTMMap.mob img').width();
+    var height = jQuery('.dTMMap.mob img').height();
+    jQuery('.dTMMap.mob .dTMMPWPin').each(function() {
+        var top = jQuery(this).data('top');
+        var left = jQuery(this).data('left');
+        var sumHeight = height * (parseInt(top) / 100)
+        var sumWidth = width * (parseInt(left) / 100)
+        var finalTop = jQuery(this).css('top', parseInt(sumHeight) + 'px');
+        var finalLeft = jQuery(this).css('left', parseInt(sumWidth) + 'px');
+    });
+
+}
+
+function mapWidthDesktop() {
+    var width = jQuery('.dTMMap.desktop img').width();
+    var height = jQuery('.dTMMap.desktop img').height();
+
+    // jQuery('.dTMMap.desktop').width(width)
+    jQuery('.dTMMap.desktop .dTMMPWPin').each(function() {
+        var top = jQuery(this).data('top');
+        var left = jQuery(this).data('left');
+        var sumHeight = height * (parseInt(top) / 100)
+        var sumWidth = width * (parseInt(left) / 100)
+        var finalTop = jQuery(this).css('top', parseInt(sumHeight) + 'px');
+        var finalLeft = jQuery(this).css('left', parseInt(sumWidth) + 'px');
+    });
+
+}
+
+function updateEscapeContentNew() {
+
+    if (jQuery(window).width() > 1300) {
+        var negMargin = '+' + Math.ceil((jQuery(window).width() - 1300) / 2);
+        jQuery('.tooltipster-fade').css('margin-left', negMargin + 'px');
+    } else {
+        jQuery('.tooltipster-fade').removeAttr('style');
+    }
+}
+
+function cssGrid() {
+    if (jQuery('.grid').length > 0) {
+        jQuery('.grid__item, .grid__description').unwrap();
+    }
+    jQuery('.dceTeamCat').each(function() {
+        var divs = $(this).find(".dceTeammodul > div");
+
+        if ($(window).width() < 769) {
+            for (var i = 0; i < divs.length; i += 2) {
+                divs.slice(i, i + 2).wrapAll("<div class='grid'></div>");
+            }
+        } else if ($(window).width() < 1025) {
+            for (var i = 0; i < divs.length; i += 4) {
+                divs.slice(i, i + 4).wrapAll("<div class='grid'></div>");
+            }
+        } else if ($(window).width() < 1375) {
+            for (var i = 0; i < divs.length; i += 6) {
+                divs.slice(i, i + 6).wrapAll("<div class='grid'></div>");
+
+            }
+        } else {
+            for (var i = 0; i < divs.length; i += 8) {
+                divs.slice(i, i + 8).wrapAll("<div class='grid'></div>");
+            }
+        }
+    });
+
+}
+
+if ((GetIEVersion() > 0) && (GetIEVersion() < 12)) {
+
+} else {
+    if (jQuery('.parallax').length > 0) {
+        jQuery('.parallax').each(function() {
+            var imgHeight = jQuery(this).height();
+            var contentHeight = jQuery(this).closest('.dTSImg').next().height();
+        });
+        /* entfernt wegen designpolizei #5
+        $(window).on('scroll', function() {
+        	var blubber = (parseInt($(this).scrollTop() / -10));
+
+        	if (blubber < -280) {
+        		blubber = -280;
+        	}
+        	jQuery('.parallax').css({
+        		'top': blubber + "px"
+        	});
+        });
+        */
+    }
+}
+jQuery(window).resize(function() {
+    if ($(window).width() < 1374) {
+        mapWidthMob();
+    } else {
+        mapWidthDesktop();
+    }
+});

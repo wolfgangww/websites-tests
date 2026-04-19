@@ -1,0 +1,24 @@
+jQuery(document).ready(function() { jQuery('a[class*=lightbox],a[rel*=lightbox]').fancybox({		'speed' : 330,
+		'loop' : true,
+		'opacity' : 'auto',
+		'margin' : [44, 0],
+		'gutter' : 30,
+		'infobar' : true,
+		'buttons' : true,
+		'slideShow' : true,
+		'fullScreen' : true,
+		'thumbs' : true,
+		'closeBtn' : true,
+		'smallBtn' : 'auto',
+
+		'baseClass' : '',
+		'slideClass' : '',
+		'parentEl' : 'body',
+		'touch' : true,
+		'keyboard' : true,
+		'focus' : true,
+		'closeClickOutside' : true,
+
+		'beforeShow' : function(opts) {
+			this.title = (jQuery(this.group[this.index]).attr('title') != undefined ? jQuery(this.group[this.index]).attr('title') : jQuery(this.group[this.index]).find('img').attr('title'));
+		}});  });

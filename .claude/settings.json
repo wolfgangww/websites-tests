@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python3 ui-ux-pro-max-skill/.claude/skills/ui-ux-pro-max/scripts/search.py \"test\" --help)",
+      "Bash(python ui-ux-pro-max-skill/.claude/skills/ui-ux-pro-max/scripts/search.py \"test\" --help)",
+      "Bash(python src/ui-ux-pro-max/scripts/search.py \"test\" --help)",
+      "Bash(python src/ui-ux-pro-max/scripts/search.py \"minimalist saas\" --design-system -p \"Test\")"
+    ]
+  }
+}

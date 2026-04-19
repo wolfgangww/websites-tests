@@ -1,0 +1,306 @@
+/* wenn bootstrap nicht eingebunden ist */
+/* beginn */ 
+.w-100 {
+    width: 100% !important;
+}
+.p-3 {
+    padding: 1rem !important;
+}
+/* ende */ 
+
+.webxDPStyle {
+        user-select: none;
+        -moz-user-select: none;
+        -khtml-user-select: none;
+        -webkit-user-select: none;
+        -o-user-select: none;
+} 
+
+.webxDPStyle {
+	margin: 0px auto 0 auto;
+	width: 680px;
+	/* height: 450px; */
+	padding: 25px 30px 30px 30px;
+	z-index: 1001;
+	background: #fff;
+	overflow:hidden;
+	box-shadow: 0 16px 24px 2px rgba(0,0,0,0.14), 0 6px 30px 5px rgba(0,0,0,0.12), 0 8px 10px -7px rgba(0,0,0,0.2);
+	color: #333;
+	position: absolute;
+}
+
+.webxDPStyle .table-condensed {
+	margin-top: 2.5%;
+	text-align:center;
+	cursor: pointer;
+	width: 46%;
+}
+.webxDPStyle .date-left{
+	margin-right:10px;
+}
+.webxDPStyle .date-right{
+	margin-left:10px;
+}
+
+.webxDPStyle table {
+	border-spacing: 0px;
+}
+.webxDPStyle table td{
+    vertical-align: middle;
+    font-size:16px;
+    font-weight:bold;
+    min-width: 44px;
+    height: 44px;
+    line-height: 44px;
+}
+
+.webxDPStyle .table-wrapper {
+	display:-webkit-box;
+	display:-ms-flexbox;
+	display:flex;
+	-ms-flex-pack: distribute;
+	    justify-content: space-around;
+}
+
+.webxDPStyle .webxDPclose {
+	display:none;
+}
+
+.webxDPStyle .calendarHeader {
+	display:-webkit-box;
+	display:-ms-flexbox;
+	display:flex;
+	-webkit-box-pack: justify;
+	    -ms-flex-pack: justify;
+	        justify-content: space-between;
+}
+
+.webxDPStyle .calendarHeader .months {
+	width: 75%;
+	display:-webkit-box;
+	display:-ms-flexbox;
+	display:flex;
+	-ms-flex-pack: distribute;
+	    justify-content: space-around;
+}
+
+.webxDPStyle .calendarHeader .months span {
+	font-size: 20px;
+	line-height: initial;
+}
+
+.webxDPStyle .calendarHeader .months span:first-child {
+	/*margin-right: 33.333333333%;*/
+}
+
+.webxDPStyle .calendarHeader .webxDPprev {
+	width: 2.5%;
+    text-align: center;
+    color: #fff;
+}
+
+.webxDPStyle .calendarHeader .webxDPprevHidden { width: 2.5%; }
+
+/*.webxDPStyle .calendarHeader .webxDPnext { 
+	width: 2.5%;
+    text-align: center;
+    color: #fff;
+}*/
+
+.webxDPStyle .calendarHeader .webxDPprev {
+	width: 2.5%;
+	cursor: pointer;
+    text-align: center;
+    background: none;
+    color: #fff;
+    display:block;
+    width:20px;
+    height:20px;
+     border-left:2px solid #e2001a;
+    border-bottom:2px solid #e2001a;
+    -moz-transform: rotate(45deg);
+    -ms-transform: rotate(45deg);
+    -o-transform: rotate(45deg);
+    -webkit-transform: rotate(45deg);
+}
+
+.webxDPStyle .calendarHeader .webxDPnext { 
+	width: 2.5%;
+	cursor: pointer;
+    text-align: center;
+    background: none;
+    color: #fff;
+    display:block;
+    width:20px;
+    height:20px;
+    border-right:2px solid #e2001a;
+    border-bottom:2px solid #e2001a;
+    -moz-transform: rotate(-45deg);
+    -ms-transform: rotate(-45deg);
+    -o-transform: rotate(-45deg);
+    -webkit-transform: rotate(-45deg);
+}
+
+.webxDPStyle .calendarHeader  i{
+    background: #e2001a;
+	cursor: pointer;
+	line-height: 25px;
+	    display: block;
+}
+
+.webxDPStyle .calendarHeader svg{
+    background: #e2001a;
+	cursor: pointer;
+	line-height: 25px;
+	    display: block;
+}
+
+.webxDPStyle .day {
+	/*background: #39b54a;*/
+	border: 1px solid #fff;
+	margin: 0px;
+	color: #1a171b;
+}
+
+.webxDPStyle .date-year {
+}
+
+.webxDPStyle .disabled {
+	border: 1px solid #fff;
+	/*background: #ddd;*/
+	cursor:default;
+	color:#f8f8f8;
+}
+.webxDPStyle .disabled.no-day{
+	background: #fff;
+}
+
+.webxDPStyle .webxDPcheckin {
+	background: #e2001a;
+	position: relative;
+	color:#fff;
+}
+.webxDPStyle .webxDPcheckin:before{
+    content: '';
+    width: 0;
+    height: 0;
+    border-style: solid;
+    border-width: 7px 0 7px 11px;
+    border-color: transparent transparent transparent #fff;
+    position: absolute;
+    top: 40%;
+    bottom: 0;
+    left: -1px;
+    z-index: 2;
+}
+
+.webxDPStyle .webxDPcheckout {
+	background: #e2001a;
+	position: relative;
+	color:#fff;
+}
+.webxDPStyle .webxDPcheckout:before{
+    content: '';
+    width: 0;
+    height: 0;
+    border-style: solid;
+    border-width: 7px 11px 7px 0;
+    border-color: transparent #fff transparent transparent;
+    position: absolute;
+    top: 40%;
+    bottom: 0;
+    right: -1px;
+    z-index: 2;
+}
+.webxDPStyle .webxDPduration {
+	background: #f8f8f8;
+}
+
+/*@media only screen and (max-width: 1024px) {
+	.webxDPStyle {
+		width: 95%;
+	}
+
+}*/
+
+@media only screen and (max-width: 1024px) {
+
+	.webxDPStyle {
+		margin: 0px; 
+		width: 100%;
+		height: 100%;
+		padding: 0px 0px 0px 0px;
+		position: fixed; top: 0; left: 0;
+		overflow: auto;
+	}
+
+	.webxDPStyle .webxDPclose {
+		display:block;
+		font-size: 30px;
+		cursor: pointer;
+		color: #e2001a;
+		text-align: right;
+		padding: 1rem;
+		padding-right: 2rem;
+        position: relative;
+    }
+
+    .webxDPStyle .webxDPclose::before,.webxDPStyle .webxDPclose::after {
+		content: '';
+		position: absolute;
+		height: 2px;
+		width: 30px;
+		top: 50%;
+		right: 8vw;
+		margin-top: -1px;
+		background: #e2001a;
+	}
+
+	.webxDPStyle .webxDPclose::before {
+		-moz-transform: rotate(45deg);
+		-ms-transform: rotate(45deg);
+		-o-transform: rotate(45deg);
+		-webkit-transform: rotate(45deg);
+	}
+	.webxDPStyle .webxDPclose::after {
+		-moz-transform: rotate(-45deg);
+		-ms-transform: rotate(-45deg);
+		-o-transform: rotate(-45deg);
+		-webkit-transform: rotate(-45deg);
+	}
+
+	.webxDPStyle .calendarHeader {
+		padding-left: 10% !important;
+		padding-right: 10% !important;
+	}
+	.webxDPStyle .calendarHeader .months span {
+		display: block;
+	}
+
+	.webxDPStyle .table-condensed {
+		margin: 0 10% 0 10%;
+		width: 80%;
+	}
+
+	.webxDPStyle .date-right {
+		display:none;
+	}
+
+	.webxDPStyle .calendarHeader .months span:first-child {
+		margin-right: 0;
+	}
+
+	.webxDPStyle .calendarHeader .months span:last-child {
+		display:none;
+	}
+
+	.webxDPStyle .calendarHeader .months{
+		flex-direction: column-reverse;
+		text-align: center;
+	}
+	.webxDPStyle .calendarHeader .months .date-year{
+		font-size: 16px;
+	}
+
+
+}

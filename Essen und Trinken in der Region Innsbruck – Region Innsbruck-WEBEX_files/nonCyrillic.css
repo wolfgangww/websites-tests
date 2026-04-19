@@ -1,0 +1,16 @@
+@font-face {
+	font-family: 'AltoProCon-Bold';
+	src: url('/fileadmin/templates/fonts/AltoProCon-Bold.woff2') format('woff2'),
+         url('/fileadmin/templates/fonts/AltoProCon-Bold.woff') format('woff'), /* Pretty Modern Browsers */
+         url('/fileadmin/templates/fonts/AltoProCon-Bold.ttf') format('truetype'); /* Safari, Android, iOS */
+}
+@font-face {
+	font-family: 'AltoProCon-Medium';
+	src: url('/fileadmin/templates/fonts/AltoProCon-Medium.woff2') format('woff2'),
+	     url('../fonts/AltoProCon-Medium.woff') format('woff'), /* Pretty Modern Browsers */
+	     url('../fonts/AltoProCon-Medium.ttf') format('truetype'); /* Safari, Android, iOS */
+}
+
+html {	
+	font-size: 62.5%;
+}

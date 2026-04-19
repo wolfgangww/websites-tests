@@ -1,0 +1,45 @@
+jQuery(document).ready(function() {
+	jQuery('.cookie-panel__button').on('click touch',function(e) {
+
+		var cat = jQuery(this).data('omcookie-panel-save');
+		if(cat == 'save') {
+			if (jQuery('#group-3:checked').val() == 'group-3') {
+				cat = 'all'
+			} else {
+				cat = 'min';
+			}
+		}
+
+		var data = {cookie: cat};
+
+		jQuery.ajax({
+			type: "POST",
+			url: '/typo3conf/ext/webx_clicktrack/Resources/Public/PHP/addClick.php',
+			data: data
+		});
+	});
+
+	jQuery(document).on('click touch','#CybotCookiebotDialogBodyLevelButtonLevelOptinAllowAll', function(){
+		var cat = 'cb-all';
+		console.log('foo');
+		var data = {cookie: cat};
+
+		jQuery.ajax({
+			type: "POST",
+			url: '/typo3conf/ext/webx_clicktrack/Resources/Public/PHP/addClick.php',
+			data: data
+		});
+	});
+
+	jQuery(document).on('click touch','#CybotCookiebotDialogBodyLevelButtonLevelOptinDeclineAll, #CybotCookiebotDialogBodyLevelButtonLevelOptinAllowallSelection', function(){
+		var cat = 'cb-min';
+console.log('foo');
+		var data = {cookie: cat};
+
+		jQuery.ajax({
+			type: "POST",
+			url: '/typo3conf/ext/webx_clicktrack/Resources/Public/PHP/addClick.php',
+			data: data
+		});
+	});
+});

@@ -1,0 +1,3015 @@
+var map = null;
+var ids = null;
+var firstSearch = true;
+
+
+function checksum(s) {
+    var hash = 0, strlen = s.length, i, c;
+    if ( strlen === 0 ) {
+        return hash;
+    }
+    for ( i = 0; i < strlen; i++ ) {
+        c = s.charCodeAt( i );
+        hash = ((hash << 5) - hash) + c;
+        hash = hash & hash; // Convert to 32bit integer
+    }
+    return hash;
+};
+
+function doPaginate(page,selectorId,container) {
+    jQuery("html, body").animate({ scrollTop: jQuery(".tx-webx-bookingemo .listView").offset().top + "px" });
+    jQuery(".tx-webx-bookingemo .serviceProviderLoader .loader").slideDown("fast");
+    jQuery("#" + selectorId).slideUp("fast", function(){
+        jQuery(this).html("");
+    });
+
+    // save cookie for back link
+    jQuery.cookie("webxbookingemo_u_back", jQuery(".tx-webx-bookingemo .searchView form").serialize(), { expires : 0.01 });
+    jQuery.cookie("webxbookingemo_u_filter", jQuery(".tx-webx-bookingemo .emofilter form").serialize(), { expires : 0.01 });
+    jQuery.cookie("webxbookingemo_u_backpage", page, { expires : 0.01 });
+    jQuery.cookie('webxbookingemo_location', checksum(location.href), { expires : 0.01 });
+
+
+    EmoAjax_ajaxSearch(jQuery(".tx-webx-bookingemo .searchView form").serialize(), jQuery(".tx-webx-bookingemo .emofilter form").serialize(), page, jQuery("#" + selectorId ).data());
+
+    jQuery("html").scrollTop(0);
+
+}
+
+function loadMore(page,selectorId,container) {
+    EmoAjax_ajaxSearch(jQuery(".tx-webx-bookingemo .searchView form").serialize(), jQuery(".tx-webx-bookingemo .emofilter form").serialize(), page, jQuery("#" + selectorId ).data());
+}
+
+function PackageLoadMore(page,selectorId,container) {
+    EmoAjax_ajaxReloadPackages(jQuery(".tx-webx-bookingemo .packageFilterView form").serialize(), jQuery(".tx-webx-bookingemo .packageFilterView .emofilter form").serialize(), page,selectorId,container);
+}
+
+function ShopitemLoadMore(page,selectorId,container) {
+    EmoAjax_ajaxReloadShopitems(jQuery(".tx-webx-bookingemo .shopitemFilterView form").serialize(), jQuery(".tx-webx-bookingemo .shopitemFilterView form").serialize(), page,selectorId,container);
+}
+
+function EventPaginate(page, selectorId, container) {
+    jQuery("#" + selectorId ).html("");
+    jQuery(".tx-webx-bookingemo .loader").show();
+
+    // save cookie for back link
+    jQuery.cookie("webxbookingemo_e_back", jQuery(".tx-webx-bookingemo .eventFilterView form").serialize(), { expires : 0.01 });
+    jQuery.cookie("webxbookingemo_e_filter", jQuery(".tx-webx-bookingemo .eventView .emofilter form").serialize(), { expires : 0.01 });
+    jQuery.cookie("webxbookingemo_e_backpage", page, { expires : 0.01 });
+    jQuery.cookie('webxbookingemo_location', checksum(location.href), { expires : 0.01 });
+
+    // jQuery.cookie(checksum(location+'webxbookingemo_e_back'),jQuery(".tx-webx-bookingemo .eventFilterView form").serialize(), { expires : 0.01 });
+    // jQuery.cookie(checksum(location+'webxbookingemo_e_backpage'),page, { expires : 0.01 });
+
+    EmoAjax_ajaxReloadEvents(jQuery(".tx-webx-bookingemo .eventFilterView form").serialize(), jQuery(".tx-webx-bookingemo .eventSortingView form").serialize(), page, jQuery("#" + selectorId ).data());
+
+    jQuery("html").scrollTop(0);
+}
+
+function EventLoadMore(page, selectorId, container) {
+    console.log( jQuery(".tx-webx-bookingemo .eventView .eventSortingView form").serialize());
+
+    EmoAjax_ajaxReloadEvents(jQuery(".tx-webx-bookingemo .eventFilterView form").serialize(), jQuery(".tx-webx-bookingemo .eventSortingView form").serialize(), page, jQuery("#" + selectorId ).data());
+}
+
+
+function InfrastructurePaginate (page, selectorId, container) {
+    // jQuery("#" + selectorId ).slideUp("fast", function(){
+    //     jQuery(this).html("");
+    // });
+    jQuery("#" + selectorId ).html("");
+    // jQuery(".tx-webx-bookingemo .loader").slideDown("fast");
+
+    // save cookie for back link
+    jQuery.cookie("webxbookingemo_i_back", jQuery(".tx-webx-bookingemo .infrastructureFilterView form").serialize(), { expires : 0.01 });
+    jQuery.cookie("webxbookingemo_i_filter", jQuery(".tx-webx-bookingemo .emofilter form").serialize(), { expires : 0.01 });
+    jQuery.cookie("webxbookingemo_i_backpage", page, { expires : 0.01 });
+    jQuery.cookie('webxbookingemo_location', checksum(location.href), { expires : 0.01 });
+    EmoAjax_ajaxReloadInfrastructures(jQuery(".tx-webx-bookingemo .infrastructureFilterView form").serialize(), jQuery(".tx-webx-bookingemo .emofilter form").serialize(), page, jQuery("#" + selectorId ).data());
+
+    jQuery("html").scrollTop(0);
+}
+
+function InfrastructureLoadMore (page, selectorId, container) {
+    EmoAjax_ajaxReloadInfrastructures(jQuery(".tx-webx-bookingemo .infrastructureFilterView form").serialize(), jQuery(".tx-webx-bookingemo .emofilter form").serialize(), page, jQuery("#" + selectorId ).data());
+}
+
+function PackagePaginate (page, selectorId) {
+    jQuery("#" + selectorId ).html("");
+
+    // save cookie for back link
+    jQuery.cookie("webxbookingemo_p_back", jQuery(".tx-webx-bookingemo .packageFilterView form").serialize(), { expires : 0.01 });
+    jQuery.cookie("webxbookingemo_p_filter", jQuery(".tx-webx-bookingemo .packageFilterView .sortLinks form").serialize(), { expires : 0.01 });
+    jQuery.cookie("webxbookingemo_p_backpage", page, { expires : 0.01 });
+
+    EmoAjax_ajaxReloadPackages(jQuery(".tx-webx-bookingemo .packageFilterView form").serialize(), jQuery(".tx-webx-bookingemo .packageFilterView .sortLinks form").serialize(), page, jQuery("#" + selectorId ).data());
+}
+
+function ShopitemPaginate (page) {
+    jQuery("#shopitemResults ").slideUp("fast", function(){
+        jQuery(this).html("");
+    });
+    jQuery(".tx-webx-bookingemo .loader").slideDown("fast");
+
+    // save cookie for back link
+    jQuery.cookie("webxbookingemo_p_back", jQuery(".tx-webx-bookingemo .shopitemFilterView form").serialize(), { expires : 0.01 });
+    jQuery.cookie("webxbookingemo_p_filter", jQuery(".tx-webx-bookingemo .shopitemFilterView .sortLinks form").serialize(), { expires : 0.01 });
+    jQuery.cookie("webxbookingemo_p_backpage", page, { expires : 0.01 });
+
+    EmoAjax_ajaxReloadShopitems(jQuery(".tx-webx-bookingemo .shopitemFilterView form").serialize(), jQuery(".tx-webx-bookingemo .shopitemFilterView .sortLinks form").serialize(), page);
+}
+
+
+
+jQuery(document).ready(function(){
+
+    jQuery(document).on('touchend','.search-choice-close',function(){jQuery(this).trigger('click');});
+
+    // $('body').on('click','.tx-webx-boookingemo .search-choice',function(){$(this).find('.search-choice-close').trigger('click');console.log('clicked');});
+
+    jQuery('.groupedfacilities ul.faciltyContent').hide();
+
+    jQuery('#trustYouLink').click( function() {
+        var w = window.open(jQuery('#trustYouLink').data('url'), "popupWindow", jQuery('#trustYouLink').data('style'));
+    });
+
+    /* filter preselect */
+    args = decodeURIComponent(location.search.slice(1)).split('&');
+    if (!Array.isArray(args)) args = [args];
+    /*console.log("doep");*/
+    for ( i in args ) {
+        if (args[i].includes("filter=")) {
+            ids = args[i].replace("filter=","").split(",");
+            if ( jQuery(".tx-webx-bookingemo .filterView form").length > 0 ) {
+                jQuery.each(ids, function(a,i) {
+                    if(jQuery(".tx-webx-bookingemo input[name^='tx_webxbookingemo'][value='" + i +"']").length > 0 )  {
+                        jQuery(".tx-webx-bookingemo input[name^='tx_webxbookingemo'][value='" + i +"']").prop('checked', true);
+                        // jQuery("#filterBookingemoHidden").remove();
+                    } else if( jQuery("#filterBookingemoHidden"+i).length > 0 ) {
+                        jQuery("#filterBookingemoHidden"+i).val(i);
+                    } else {
+                        jQuery(".tx-webx-bookingemo .filterView form").append('<input type="hidden" name="' + jQuery(jQuery(".tx-webx-bookingemo input[name^='tx_webxbookingemo']")[0]).attr('name').replace(/([a-zA-Z_]*)(?:.*)/gi,'$1') + '[filterHidden][]" value="' + i + '" />');
+                    }
+
+                });
+                jQuery.each(ids, function(a,i) {
+                    jQuery(".tx-webx-bookingemo option[value='" + i +"']").prop('selected', true);
+                });
+                jQuery('.tx-webx-bookingemo select.chosen-multiselect').trigger("chosen:updated");
+                jQuery('.tx-webx-bookingemo .filterView form').trigger("submit");
+            } else {
+                if ( jQuery(".emoback.dceButton.normal a.emoButton.pull-left,.backToList.dceButton.normal a.emoButton.pull-left").length > 0 ) {
+                    jQuery(".emoback.dceButton.normal a.emoButton.pull-left,.backToList.dceButton.normal a.emoButton.pull-left").each( function() {
+                        $(this).attr("href",$(this).attr('href')+'?filter='+ids.join(','));
+                    });
+                }
+            }
+
+        }
+    }
+
+
+    /* filter preselect  DEPRECATED*/
+    /*if (location.search && location.search.match(/\?filter=/g)) {
+        var ids = location.search.replace(/\?filter=/g, "").split(",");
+        // console.log(jQuery("#filterBookingemoHidden").length);
+        jQuery.each(ids, function(a,i) {
+            if(jQuery(".tx-webx-bookingemo input[name^='tx_webxbookingemo'][value='" + i +"']").length > 0 )  {
+                jQuery(".tx-webx-bookingemo input[name^='tx_webxbookingemo'][value='" + i +"']").prop('checked', true);
+                // jQuery("#filterBookingemoHidden").remove();
+            } else if( jQuery("#filterBookingemoHidden").length > 0 ) {
+                jQuery("#filterBookingemoHidden").val(i);
+            }
+        });
+
+        jQuery.each(ids, function(a,i) {
+            jQuery(".tx-webx-bookingemo option[value='" + i +"']").prop('selected', true);
+        });
+        jQuery('.tx-webx-bookingemo select.chosen-multiselect').trigger("chosen:updated");
+        console.log(jQuery('.tx-webx-bookingemo .filterView form'));
+        jQuery('.tx-webx-bookingemo .filterView form').trigger("submit");
+    }
+
+    if( empty(jQuery("#filterBookingemoHidden").val())) {
+
+        jQuery("#filterBookingemoHidden").remove();
+    }*/
+
+
+    /* Restaurant Category switcher */
+    jQuery(".tx-webx-bookingemo .rscategory").click(function () {
+        if (jQuery(this).hasClass("rsactive")) {
+            console.log(jQuery('.fWAcc.InfrastructureTopics').parents('.fWrap'));
+            jQuery(".tx-webx-bookingemo .rscategory").removeClass('rsactive');
+            /*jQuery(".tx-webx-bookingemo input[type='checkbox'][name^='tx_webxbookingemo_infrastructure']").parent().show();*/
+            jQuery(".tx-webx-bookingemo .InfrastructureTopics input[type='checkbox'][name^='tx_webxbookingemo_infrastructure']").parent().hide();
+
+            jQuery('#FilterRestaurantSearch').val("");
+            jQuery('#FilterRestaurantSearch').trigger('change');
+            jQuery('.fWAcc.InfrastructureTopics').parents('.fWrap').css('min-height', (jQuery('.fWAcc.InfrastructureTopics .fWAccContent').height() + $('.rscategorySlider').outerHeight(true) ));
+            return;
+        }
+
+        jQuery(".tx-webx-bookingemo .rscategory").removeClass('rsactive');
+        jQuery(this).addClass('rsactive');
+
+        jQuery(".tx-webx-bookingemo .InfrastructureTopics input[type='checkbox'][name^='tx_webxbookingemo_infrastructure']").parent().hide();
+
+        if(jQuery(this).data('enfilter') &&  !Number.isInteger(jQuery(this).data('enfilter'))  ) {
+            // console.log(jQuery(this).data('enfilter').split(","));
+            jQuery.each(jQuery(this).data('enfilter').split(","), function (a,i) {
+                jQuery(".tx-webx-bookingemo .InfrastructureTopics input[type='checkbox'][name^='tx_webxbookingemo_infrastructure'][value='" + i + "']").parent().show();
+            });
+        } else {
+             jQuery(".tx-webx-bookingemo .InfrastructureTopics input[type='checkbox'][name^='tx_webxbookingemo_infrastructure'][value='" + jQuery(this).data('enfilter') + "']").parent().show();
+        }
+
+        jQuery('#FilterRestaurantSearch').val(jQuery(this).data('filter'));
+        jQuery('#FilterRestaurantSearch').trigger('change');
+
+
+
+        jQuery('.fWAcc.InfrastructureTopics .fWAccHead:not(.act)').trigger('click');
+        jQuery('.fWAcc.InfrastructureTopics').parents('.fWrap').css('min-height', (jQuery('.fWAcc.InfrastructureTopics .fWAccContent').height() + $('.rscategorySlider').outerHeight(true) ));
+        ;
+    });
+
+    //SELECT TRANSFORM -> thx!
+    jQuery('.cs-select').chosen({
+        disable_search: true
+    });
+
+    if (jQuery(".tx-webx-bookingemo #serviceProviderResults").length > 0) {
+        if (jQuery.cookie("webxbookingemo_u_back") != undefined && jQuery.cookie("webxbookingemo_u_back") != "") {
+            jQuery("#serviceProviderResults").html("");
+            jQuery(".tx-webx-bookingemo .loader").slideDown("fast");
+            EmoAjax_ajaxSearch(jQuery.cookie("webxbookingemo_u_back"), jQuery.cookie("webxbookingemo_u_filter"), jQuery.cookie("webxbookingemo_u_backpage"));
+        }
+    }
+
+    if (jQuery(".tx-webx-bookingemo #serviceProviderGridResults").length > 0) {
+        if (jQuery.cookie("webxbookingemo_u_back") != undefined && jQuery.cookie("webxbookingemo_u_back") != "") {
+            jQuery("#serviceProviderGridResults").html("");
+            jQuery(".tx-webx-bookingemo .loader").slideDown("fast");
+            EmoAjax_ajaxSearch(jQuery.cookie("webxbookingemo_u_back"), jQuery.cookie("webxbookingemo_u_filter"), jQuery.cookie("webxbookingemo_u_backpage"),'serviceProviderGridResults','gridView');
+        }
+    }
+
+    if (jQuery(".tx-webx-bookingemo .events #eventResults").length > 0) {
+        if (jQuery.cookie("webxbookingemo_e_back") != undefined && jQuery.cookie("webxbookingemo_e_back") != "") {
+            jQuery("#eventResults").html("");
+            jQuery(".tx-webx-bookingemo .loader").slideDown("fast");
+            EmoAjax_ajaxReloadEvents(jQuery.cookie("webxbookingemo_e_back"), jQuery.cookie("webxbookingemo_e_filter"), jQuery.cookie("webxbookingemo_e_backpage"));
+        }
+    }
+
+    /*if (jQuery(".tx-webx-bookingemo #packageResults").length > 0) {
+
+        if (jQuery.cookie("webxbookingemo_p_back") != undefined && jQuery.cookie("webxbookingemo_p_back") != "") {
+            jQuery("#packageResults").html("");
+            jQuery(".tx-webx-bookingemo .loader").slideDown("fast");
+            EmoAjax_ajaxReloadPackages(jQuery.cookie("webxbookingemo_p_back"), jQuery.cookie("webxbookingemo_p_filter"), jQuery.cookie("webxbookingemo_p_backpage"));
+        }
+    }*/
+
+
+    var mobile = (/android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(navigator.userAgent.toLowerCase()));
+
+
+    if (mobile) {
+      //  jQuery('.customtoggle').css('display','none');
+    }
+
+    jQuery(".tx-webx-bookingemo .children").trigger("change");
+
+
+
+    // serviceprovider LIST
+    jQuery(".loadServiceProviders").each(function() {
+        tmp = window.location.search.substring(1).split('&');
+        for (i in tmp ) if (tmp[i].split('=')[0] == 'filter') return;
+        if (jQuery(this).html() == '' ) {
+            firstSearch = false;
+            jQuery(".tx-webx-bookingemo .loader").slideDown("fast");
+            EmoAjax_ajaxSearch("","",1,$(this).data());
+            jQuery(".tx-webx-bookingemo .serviceProviderLoader .loader").slideUp("fast");
+        } else if (jQuery.cookie('webxbookingemo_location') == checksum(location.href)) {
+            firstSearch = false;
+            $(this).html('');
+            EmoAjax_ajaxSearch(jQuery.cookie("webxbookingemo_u_back"), jQuery.cookie("webxbookingemo_u_filter"), jQuery.cookie("webxbookingemo_u_backpage"), $(this).data());
+        }
+    });
+
+    jQuery(".loadEvents").each(function() {
+        tmp = window.location.search.substring(1).split('&');
+        for (i in tmp ) if (tmp[i].split('=')[0] == 'filter') return;
+        if($.trim($(this).html()) == '' ) {
+            firstSearch = false;
+            jQuery(".tx-webx-bookingemo .loader").slideDown("fast");
+            if(jQuery(".tx-webx-bookingemo .eventFilterView form").length > 0 ) {
+                EmoAjax_ajaxReloadEvents(jQuery(".tx-webx-bookingemo .eventFilterView form").serialize(), jQuery(".tx-webx-bookingemo .eventSortingView form").serialize(), 1, $(this).data());
+            } else {
+                EmoAjax_ajaxReloadEvents(jQuery.cookie("webxbookingemo_e_back"), jQuery.cookie("webxbookingemo_e_filter"), 1, $(this).data());
+
+            }
+            jQuery(".tx-webx-bookingemo .loader").slideUp("fast");
+        } else if (jQuery.cookie('webxbookingemo_location') == checksum(location.href)) {
+            firstSearch = false;
+            $(this).html('');
+            EmoAjax_ajaxReloadEvents(jQuery.cookie("webxbookingemo_e_back"), jQuery.cookie("webxbookingemo_e_filter"), jQuery.cookie("webxbookingemo_e_backpage"), $(this).data());
+        }
+    });
+
+    /* jQuery(".loadInfrastructures").each(function() {
+        tmp = window.location.search.substring(1).split('&');
+        for (i in tmp ) if (tmp[i].split('=')[0] == 'filter') return;
+        if($.trim($(this).html()) == '' ) {
+            firstSearch = false;
+            jQuery(".tx-webx-bookingemo .loader").slideDown("fast");
+            if(jQuery(".tx-webx-bookingemo .infrastructureFilterView form").length > 0 ) {
+                EmoAjax_ajaxReloadInfrastructures(jQuery(".tx-webx-bookingemo .infrastructureFilterView form").serialize(), jQuery(".tx-webx-bookingemo .infrastructureFilterView .sortLinks form").serialize(), 1, $(this).data());
+            } else {
+                EmoAjax_ajaxReloadInfrastructures('','', 1, $(this).data());
+            }
+            jQuery(".tx-webx-bookingemo .loader").slideUp("fast");
+        } else if (jQuery.cookie('webxbookingemo_location') == checksum(location.href)) {
+            firstSearch = false;
+            $(this).html('');
+            EmoAjax_ajaxReloadInfrastructures(jQuery.cookie("webxbookingemo_i_back"), jQuery.cookie("webxbookingemo_i_filter"), jQuery.cookie("webxbookingemo_i_backpage"), $(this).data());
+        }
+    }); */
+
+    jQuery(".loadShopItems").each(function() {
+        if($.trim($(this).html()) == '' ) {
+            jQuery(".tx-webx-bookingemo .loader").slideDown("fast");
+            EmoAjax_ajaxReloadShopitems("", "", 1, $(this).attr('id'), $(this).parent().attr('class').split(' ')[0]);
+            jQuery(".tx-webx-bookingemo .loader").slideUp("fast");
+        }
+    });
+
+    jQuery(".loadPackages").each(function() {
+        if($.trim($(this).html()) == '' ) {
+            console.log($(this).data());
+
+            jQuery(".tx-webx-bookingemo .loader").slideDown("fast");
+            EmoAjax_ajaxReloadPackages("", "", 1, $(this).data());
+            jQuery(".tx-webx-bookingemo .loader").slideUp("fast");
+        }
+    });
+
+    /*if($('.chgrid').length==0||$('.chmap').length==0||$('.chlist').length==0)
+        jQuery(".loadMapServiceProviders").each(function() {
+            if (map === null ) map = new Map($(this).data('latlong'),$(this).data('zoom'),$(this).data('minzoom'),$(this).data('maxzoom'), 'map-canvas');
+            EmoAjax_ajaxMapSearch();
+        });*/
+
+
+    if (window.location.hash == "#ratings") {
+        jQuery('.tx-webx-bookingemo  .tabs .tab[data-tab=ratings]').trigger('click');
+    }
+
+    jQuery('.tx-webx-bookingemo .singleView .systemTrustYou .ty-seal').click(function() {
+        //alert("geklickt.");
+        jQuery('.tx-webx-bookingemo  .tabs .tab[data-tab=ratings]').trigger('click');
+    });
+
+
+    //flashmessages to sweetalerts
+    jQuery(".typo3-messages .typo3-message").each(function(){
+        var title = jQuery(this).find(".message-header").html();
+        var text = jQuery(this).find(".message-body").html();
+
+        if(jQuery(this).find(".message-header").length == 0) {
+            title = text;
+            text = "";
+        }
+
+        var state = "";
+        if(jQuery(this).hasClass("message-ok"))
+            state = "success";
+        if(jQuery(this).hasClass("message-error"))
+            state = "error";
+
+        //swal(title, text, state);
+        swal({
+            title: title,
+            text: text,
+            html: true,
+            type: state
+        });
+    });
+
+
+    if(jQuery(".tx-webx-bookingemo .singleView .loadAvailabilities.showLoader").length > 0)
+        setTimeout(function(){
+            jQuery(".tx-webx-bookingemo .singleView .loadAvailabilities.showLoader").each(function(){
+                //xajax_ajaxLoadAvailabilities(jQuery(this).data("productuid"), jQuery(this).data("serviceuid"));
+            });
+        }, 500);
+
+    if(!mobile)
+        jQuery("input[type=date]").attr("type", "text");
+    else
+        jQuery("input[type=date]").removeClass("datepickerFrom datepickerTo");
+
+    lang = document.documentElement.lang;
+    if( lang != 'de' && lang != 'en' && lang != 'it' && lang != 'fr' && lang != 'es') lang = 'en';
+    webxDP = jQuery('.webxDP input').webxDatepicker({
+        Language: lang
+    });
+
+    jQuery(".tx-webx-bookingemo .datepickerFrom").datepicker({
+        dateFormat: 'dd.mm.yy',
+        minDate : "+0d",
+        defaultDate : "+0d",
+        changeYear : true,
+        onClose : function(selectedDate) {
+            jQuery(".tx-webx-bookingemo .datepickerTo").datepicker("option", "minDate", selectedDate);
+            jQuery(".tx-webx-bookingemo .datepickerFrom").prev(".formLabel").addClass("formTop");
+        }
+    });
+    jQuery(".tx-webx-bookingemo .datepickerTo").datepicker({
+        dateFormat: 'dd.mm.yy',
+        defaultDate : "+2d",
+        changeYear : true,
+        onClose : function(selectedDate) {
+            jQuery(".tx-webx-bookingemo .datepickerFrom").datepicker("option", "maxDate", selectedDate);
+            jQuery(".tx-webx-bookingemo .datepickerTo").prev(".formLabel").addClass("formTop");
+        }
+    });
+    /*if(jQuery("#images").length > 0) {
+     jQuery("#images").slick({
+     infinite: true,
+     slidesToShow: 2,
+     slidesToScroll: 2
+     });
+     }*/
+
+
+    var formInputs = $('.form-style');
+    formInputs.focus(function() {
+        $(this).parent().children('p.formLabel').addClass('formTop');
+        $('div#formWrapper').addClass('darken-bg');
+        $('div.logo').addClass('logo-active');
+    });
+    formInputs.focusout(function() {
+        if ($.trim($(this).val()).length == 0){
+            $(this).parent().children('p.formLabel').removeClass('formTop');
+        }
+        $('div#formWrapper').removeClass('darken-bg');
+        $('div.logo').removeClass('logo-active');
+    });
+    $('p.formLabel').click(function(){
+        $(this).parent().children('.form-style').focus();
+    });
+
+    //INPUTS PREFILL
+    $(".tx-webx-bookingemo .form-item.inputField input").on("change.autofill", function () {
+      jQuery('.tx-webx-bookingemo .form-item.inputField input').each(function(){
+        if($(this).val() != ""){
+          $(this).parent().addClass('act');
+        }
+      });
+    });
+
+    /* Event slider */
+    jQuery(".emoaddon_view_slider").slick({
+        slidesToShow: 3,
+        slidesToScroll: 1,
+        arrows:true,
+        //dots: true,
+        infinite: true,
+        prevArrow:"<button type='button' class='slick-prev pull-left'><i class='fas fa-chevron-left drop-shadow'></i></button>",
+        nextArrow:"<button type='button' class='slick-next pull-right'><i class='fas fa-chevron-right drop-shadow'></i></button>",
+        responsive: [
+
+            {
+                breakpoint: 800,
+                settings: {
+                    slidesToShow: 2
+                }
+            },
+            {
+                breakpoint: 500,
+                settings: {
+                    slidesToShow: 1
+                }
+            }
+
+        ]
+
+    });
+
+    /* validate forms */
+    // jQuery(".h5validate").h5Validate();
+
+    jQuery(".tx-webx-bookingemo .groupedfacilities h4").click(function() {
+        if (jQuery(this).hasClass("active")) {
+            jQuery(this).next('ul').slideUp();
+            jQuery(this).removeClass("active");
+        } else {
+            jQuery('.faciltyContent').slideUp();
+            jQuery('.groupedfacilities h4').removeClass("active");
+            jQuery(this).next().slideDown();
+            jQuery(this).addClass("active");
+        }
+    });
+
+    jQuery( ".tx-webx-bookingemo .serviceproviderFacilities" ).each(function() {
+        var divs = jQuery(this).find(".groupedfacilities");
+        if( typeof nowrapFac == "undefined") {
+            for(var i = 0; i < divs.length; i+=divs.length/3) {
+                divs.slice(i, i+divs.length/3).wrapAll("<div class='facilityWrap'></div>");
+            }
+        }
+    });
+
+    var divs = jQuery(".tx-webx-bookingemo .serviceFacilities .groupedfacilities");
+    if( typeof nowrapFac == "undefined") {
+        for(var i = 0; i < divs.length; i+=divs.length/3) {
+            divs.slice(i, i+divs.length/3).wrapAll("<div class='facilityWrap'></div>");
+        }
+    }
+
+
+    // rooms (eventhandler)
+    jQuery(".tx-webx-bookingemo .listView .roomButtonsWrapper").click(function(){
+        jQuery(this).toggleClass("roomsHidden");
+        jQuery(this).closest(".serviceProvider ").find(".rooms").toggleClass("roomsHidden");
+        if (!jQuery(this).hasClass("roomsHidden")) {
+            // maybe there is a prevois result
+            jQuery("#serviceProvider" +  jQuery(this).data("serviceprovider")).html("");
+
+            // enable loader
+            jQuery(".tx-webx-bookingemo .serviceProviders .loader").css("display","block");
+
+            // ga
+            ga('send', 'event', 'booking_emo', 'Zimmer anzeigen', jQuery(this).data("hotelname"));
+
+
+            // load rooms
+            xajax_ajaxLoadRooms(jQuery(this).data("serviceprovider"));
+        } else {
+            // when close disable loader
+            jQuery(".tx-webx-bookingemo .serviceProviders .loader").css("display","none");
+        }
+    });
+
+    /* class for submit when hitting enter
+    *
+    * does not work with e.preventDefault
+    *
+    * */
+
+    //if (jQuery('.submitOnEnterEMO').length > 0) {
+    //    jQuery('.submitOnEnterEMO').keypress(function (e) {
+    //    if (e.which == 13) {
+    //         jQuery(this).submit();
+    //         return false;
+    //     }
+    //    });
+    //}
+
+
+    FclickCount();
+
+
+    if(mobile) var setArrows = true;
+    else var setArrows = false;
+
+
+    jQuery('.rscategorySlider').slick({
+        rows:false,
+        dots: true,
+        infinite: false,
+        arrows: setArrows,
+        slidesToShow:6,
+        slidesToScroll: 1,
+        speed:1500,
+        variableWidth:true,
+        cssEase: 'linear',
+        speed: 300,
+        responsive: [
+                {
+                  breakpoint: 1350,
+                  settings: {
+                    slidesToShow:5,
+                  }
+                },
+                {
+                  breakpoint: 1110,
+                  settings: {
+                     slidesToShow:4,
+                  }
+                },
+                {
+                  breakpoint: 880,
+                  settings: {
+                     slidesToShow:3,
+                     slidesToScroll: 2,
+                  }
+                },
+                {
+                  breakpoint: 660,
+                  settings: {
+                     slidesToShow:1,
+                     slidesToScroll: 1,
+                     dots:false,
+                  }
+                }
+              ]
+    });
+
+});
+
+function callbackAjaxLoadAvailabilities(id) {
+    console.log("cbav: " + id);
+    jQuery("#" + id).removeClass("slick-initialized");
+    jQuery("#" + id).slick({
+        slidesToShow: 4,
+        slidesToScroll: 1,
+        arrows:true,
+        dots: false,
+        infinite: false,
+        prevArrow:"<button type='button' class='slick-prev pull-left'><i class='fas fa-chevron-left drop-shadow'></i></button>",
+        nextArrow:"<button type='button' class='slick-next pull-right'><i class='fas fa-chevron-right drop-shadow'></i></button>",
+        responsive: [
+            {
+                breakpoint: 1060,
+                settings: {
+                    slidesToShow: 3,
+                }
+            },
+            {
+                breakpoint: 768,
+                settings: {
+                    slidesToShow: 2,
+                }
+            },
+            {
+                breakpoint: 500,
+                settings: {
+                    slidesToShow: 1,
+                }
+            }
+            // You can unslick at a given breakpoint now by adding:
+            // settings: "unslick"
+            // instead of a settings object
+        ]
+    });
+}
+
+jQuery(".tx-webx-bookingemo .searchView .head").click(function(){
+    jQuery(this).next(".wrapper").slideToggle("fast", function(){
+        jQuery(this).closest(".outerWrapper").toggleClass("opened closed");
+    });
+});
+
+jQuery(".tx-webx-bookingemo .startGeoLocation").click(function(){
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(setGeoLoation);
+    }
+});
+jQuery(".tx-webx-bookingemo .calcRoute").click(function(){
+    calcRoute();
+});
+jQuery(".tx-webx-bookingemo .resetRoute").click(function(){
+    jQuery("#directionsPanel").html("");
+    jQuery(".tx-webx-bookingemo .start").val("");
+    calcRoute();
+});
+
+jQuery(".tx-webx-bookingemo .singleView .tabs .tab").click(function(e){
+    e.preventDefault();
+    jQuery(".tx-webx-bookingemo .singleView .tabs .tab").removeClass("current");
+    jQuery(this).parent().addClass("current");
+
+    if(jQuery(this).parent().hasClass("initGoogleMaps")) {
+        initialize();
+        if (navigator.geolocation)
+            navigator.geolocation.getCurrentPosition(setUserGeoLoation);
+        jQuery(this).parent().removeClass("initGoogleMaps");
+    }
+
+    jQuery(".tx-webx-bookingemo .singleView .contents .tabcontent").removeClass("current");
+    var id = jQuery(this).parent().data("tab");
+    jQuery("#" + id).addClass("current");
+});
+
+
+
+
+
+
+/* notelist */
+jQuery(".tx-webx-bookingemo .addNotelist span").click(function() {
+    var type = jQuery(this).data("type");
+    if(jQuery(".tx-webx-bookingemo .notelistView").length > 0) {
+        jQuery(".tx-webx-bookingemo .notelistView ul." + type).append("<li id='notelistItemFor" + jQuery(this).data("uid") + "' data-uid='" + jQuery(this).data("uid") + "' class='loading future'><span class='imgPlaceholder'></span>" + jQuery(this).data("title") + "<div class='clearfix'></div></li>");
+        var item = "#notelistItemFor" + jQuery(this).data("uid");
+        setTimeout(function(){
+            jQuery(item).removeClass("future");
+        },100);
+        jQuery(".tx-webx-bookingemo .notelistView .emptyMessage").removeClass("show").addClass("hide");
+    }
+    jQuery(this).closest(".notelistButtons").addClass("loading");
+    jQuery(this).closest(".serviceProvider, .singleView, .event, .infrastructure").find(".removeNotelist").toggleClass("show hide");
+    jQuery(this).parent().toggleClass("show hide");
+    xajax_ajaxModifyNotelist(type, jQuery(this).data("uid"));
+});
+
+jQuery(".tx-webx-bookingemo .removeNotelist span").click(function() {
+    var type = jQuery(this).data("type");
+    if(jQuery(".tx-webx-bookingemo .notelistView").length > 0) {
+        jQuery(".tx-webx-bookingemo .notelistView li[data-uid=" + jQuery(this).data("uid") + "]").addClass("loading").find("span").hide();
+
+        if(jQuery(".tx-webx-bookingemo .notelistView li").not(".loading").length == 0)
+            jQuery(".tx-webx-bookingemo .notelistView .emptyMessage").removeClass("hide").addClass("show");
+    }
+    jQuery(this).closest(".notelistButtons").addClass("loading");
+    jQuery(this).closest(".serviceProvider, .singleView, .event, .infrastructure").find(".addNotelist").toggleClass("show hide");
+    jQuery(this).parent().toggleClass("show hide");
+    xajax_ajaxModifyNotelist(type, jQuery(this).data("uid"));
+});
+
+jQuery(".tx-webx-bookingemo .notelistView h3 span").click(function(){
+    jQuery(this).closest(".notelistView").find("li").addClass("loading");
+    jQuery(this).closest(".notelistView").find(".removeNotelist").hide();
+
+    if(jQuery(".tx-webx-bookingemo .notelistView li").not(".loading").length == 0)
+        jQuery(".tx-webx-bookingemo .notelistView .emptyMessage").removeClass("hide").addClass("show");
+
+    jQuery(".tx-webx-bookingemo .addNotelist.hide").removeClass("hide").addClass("show");
+    jQuery(".tx-webx-bookingemo .removeNotelist.show").removeClass("show").addClass("hide");
+
+    xajax_ajaxModifyNotelist("",-1);
+});
+
+jQuery(document).ready(function(){
+    rebindNotelist();
+});
+
+function rebindNotelist() {
+    jQuery(".tx-webx-bookingemo .notelistView ul li .removeNotelist").unbind("click").bind("click", function(){
+        var type = jQuery(this).data("type");
+        var e = jQuery(".tx-webx-bookingemo .removeNotelist span[data-uid=" + jQuery(this).data("uid") + "]");
+        jQuery(this).hide().closest("li").addClass("loading");
+
+        if(jQuery(".tx-webx-bookingemo .notelistView li").not(".loading").length == 0)
+            jQuery(".tx-webx-bookingemo .notelistView .emptyMessage").removeClass("hide").addClass("show");
+
+        if(e.length > 0) {
+            e.closest(".serviceProvider, .singleView, .event").find(".addNotelist").toggleClass("show hide");
+            e.parent().toggleClass("show hide");
+        }
+
+        xajax_ajaxModifyNotelist(type, jQuery(this).data("uid"));
+    });
+}
+/* notelist */
+
+/* shopping card */
+jQuery(document).ready(function(){
+    if(jQuery(".tx-webx-bookingemo .detachedShoppingcart ").length > 0) {
+        (function() {
+            [].slice.call( document.querySelectorAll( '.checkout' ) ).forEach( function( el ) {
+                var openCtrl = el.querySelector( '.checkout__button' ),
+                    closeCtrls = el.querySelectorAll( '.checkout__cancel' );
+
+                openCtrl.addEventListener( 'click', function(ev) {
+                    ev.preventDefault();
+                    classie.add( el, 'checkout--active' );
+                    jQuery(".tx-webx-bookingemo .detachedShoppingcart").animate({"margin-top": "-10%"});
+                } );
+
+                [].slice.call( closeCtrls ).forEach( function( ctrl ) {
+                    ctrl.addEventListener( 'click', function() {
+                        classie.remove( el, 'checkout--active' );
+                        jQuery(".tx-webx-bookingemo .detachedShoppingcart").animate({"margin-top": "-30px"});
+                    } );
+                } );
+            } );
+        })();
+    }
+});
+jQuery(".tx-webx-bookingemo .singleView .room .addShoppingCard button").click(function() {
+    var uid = jQuery(this).data("productid") + "_1";
+    var i = 1;
+    while(jQuery("#shoppingCardItemFor" + uid).length > 0) {
+        uid = jQuery(this).data("productid") + "_" + i;
+        i++;
+    }
+    //jQuery(".tx-webx-bookingemo .detachedShoppingcart").animate({"margin-top": "-25%"});
+    jQuery(".tx-webx-bookingemo .shoppingCardView .emptyMessage").removeClass("show").addClass("hide");
+    var item = "#shoppingCardItemFor" + uid;
+
+    jQuery(".tx-webx-bookingemo .shoppingCardView ul").append("<li id='shoppingCardItemFor" + uid + "' data-product='" + uid + "' class='loading future'><span class='imgPlaceholder'></span>" + jQuery(this).data("title") + "<div class='clearfix'></div></li>");
+    if(jQuery(".tx-webx-bookingemo .detachedShoppingcart").length > 0) {
+        jQuery(".tx-webx-bookingemo .detachedShoppingcart").animate({"margin-top": "-10%"});
+        jQuery(".tx-webx-bookingemo .detachedShoppingcart .checkout").addClass("checkout--active");
+    }
+
+    setTimeout(function() {
+        jQuery(item).removeClass("future");
+    },100);
+
+    var searchLine = jQuery(this).data("searchline");
+    if (searchLine) {
+        xajax_ajaxModifyShoppingCard(uid, 'product', Number(searchLine));
+    } else {
+        xajax_ajaxModifyShoppingCard(uid);
+    }
+});
+setInterval(function(){
+    jQuery(".tx-webx-bookingemo .shoppingCardView h3 span,.tx-webx-bookingemo .detachedShoppingcart .checkout--active .clearShoppingcard").unbind("click").click(function(){
+        jQuery(this).closest(".shoppingCardView").find("li").addClass("loading");
+        jQuery(this).closest(".shoppingCardView").find(".removeShoppingList").hide();
+
+        if(jQuery(".tx-webx-bookingemo .shoppingCardView li").not(".loading").length == 0)
+            jQuery(".tx-webx-bookingemo .shoppingCardView .emptyMessage").removeClass("hide").addClass("show");
+
+        xajax_ajaxModifyShoppingCard(-1);
+    });
+},500);
+function rebindShoppingCard() {
+    jQuery(".tx-webx-bookingemo .shoppingCardView ul li .removeShoppingList").unbind("click").bind("click", function(){
+        jQuery(this).hide().closest("li").addClass("loading");
+        if(jQuery(".tx-webx-bookingemo .shoppingCardView li").not(".loading").length == 0)
+            jQuery(".tx-webx-bookingemo .shoppingCardView .emptyMessage").removeClass("hide").addClass("show");
+
+        xajax_ajaxModifyShoppingCard(jQuery(this).data("product"), jQuery(this).data("type"));
+    });
+}
+jQuery(document).ready(function(){
+    rebindShoppingCard();
+});
+/* shopping card */
+
+function setGeoLoation(position) {
+    jQuery(".tx-webx-bookingemo .start").val(position.coords.latitude + "," + position.coords.longitude);
+}
+function setUserGeoLoation(position) {
+    map.setZoom(9);
+
+    var myLatLng = new google.maps.LatLng( position.coords.latitude, position.coords.longitude );
+    var image = new google.maps.MarkerImage(
+        '/typo3conf/ext/webx_bookingemo/Resources/Public/Images/bluedot_retina.png',
+        null, // size
+        null, // origin
+        new google.maps.Point( 8, 8 ), // anchor (move to center of marker)
+        new google.maps.Size( 17, 17 ) // scaled size (required for Retina display icon)
+    );
+
+    myMarker = new google.maps.Marker({
+        flat: true,
+        icon: image,
+        map: map,
+        optimized: false,
+        position: myLatLng,
+        title: 'Aktueller Standort',
+        visible: true
+    });
+}
+
+function calcRoute() {
+    /*
+    jQuery("#directionsPanel").html("");
+
+    var directionsDisplay;
+    var directionsService = new google.maps.DirectionsService();
+    var startCenter = new google.maps.LatLng(map.center.k, map.center.B);
+
+    directionsDisplay = new google.maps.DirectionsRenderer();
+
+    directionsDisplay.setMap(map);
+    directionsDisplay.setPanel(document.getElementById("directionsPanel"));
+
+    var start = jQuery(".tx-webx-bookingemo .start").val();
+    var end = jQuery(".tx-webx-bookingemo .end").val();
+
+    var request = {
+        origin:start,
+        destination:end,
+        travelMode: google.maps.DirectionsTravelMode.DRIVING
+    };
+    directionsService.route(request, function(response, status) {
+        if (status == google.maps.DirectionsStatus.OK) {
+            directionsDisplay.setDirections(response);
+        }
+    });
+    */
+
+
+    var start = jQuery(".tx-webx-bookingemo .start").val();
+    var end = jQuery(".tx-webx-bookingemo .end").val();
+    var url = "https://www.google.at/maps/dir/" + start + "/" + end + ",10z";
+    window.open(url, '_blank');
+}
+
+
+/* singleview */
+jQuery(".tx-webx-bookingemo .singleView .room .anfragen").click(function(e){
+    e.preventDefault();
+    jQuery(".tx-webx-bookingemo  .tabs .tab[data-tab=enquiry]").trigger("click");
+    jQuery("#enquiry .rooms").show();
+    var parent = jQuery(this).closest(".room");
+    jQuery("html, body").animate({ scrollTop: jQuery("#enquiry").offset().top + "px" });
+    jQuery("#enquiry .rooms ul").append("<li class='future'><input type='hidden' name='tx_webxbookingemo_main[newEnquiry][relProducts][]' value='" + parent.data("uid") + "'/><div class='image'>" + parent.find(".image").html() + "</div><div class='emoButton glyphicon glyphicon-trash removeRoom pull-right'></div><div class='infos'>" + parent.find(".infos .roomTitle").html() + "</div><div class='clearfix'></div></li>")
+    setTimeout(function(){
+        jQuery("#enquiry .rooms ul li").last().removeClass("future");
+    },100);
+
+    rebindSingle();
+});
+function rebindSingle() {
+    jQuery("#enquiry ul li .removeRoom").unbind("click").click(function(){
+        var item = jQuery(this).closest("li");
+        item.addClass("past");
+        setTimeout(function(){
+            item.remove();
+            if(jQuery("#enquiry .rooms ul li").length == 0)
+                jQuery("#enquiry .rooms").hide();
+        },500);
+    });
+}
+/* singleview */
+
+
+/* searchview */
+jQuery(document).ready(function(){
+    jQuery(".tx-webx-bookingemo .searchView .roomWrapper").each(function(){
+        var val = jQuery(this).find(".children").val();
+        var parent = jQuery(this);
+        parent.find(".childrenAge").css("width", (100 / val) - 1.5 + "%");
+    });
+});
+jQuery(".tx-webx-bookingemo .searchView .children").change(function(){
+    var val = jQuery(this).val();
+    var parent = jQuery(this).closest(".roomWrapper");
+
+    parent.find(".childrenAge").attr("style","display:none;").css("width", (100 / val) - 1.5 + "%");
+    for(i = 1; i <= parent.find(".childrenAge").length;i++) {
+        if(i <= val) {
+            parent.find(".childrenAge" + i).show();
+            parent.find(".childrenAge" + i).parent().show();
+        } else {
+            parent.find(".childrenAge" + i).hide();
+            parent.find(".childrenAge" + i).parent().hide();
+        }
+    }
+
+    if(val > 0)
+        parent.find(".childrenAgeWrapper").slideDown("fast");
+    else
+        parent.find(".childrenAgeWrapper").slideUp("fast");
+});
+jQuery("#searchRooms").change(function(){
+    var val = jQuery(this).val();
+
+    for(i = 1; i < jQuery(".tx-webx-bookingemo .searchView .more .roomWrapper").length;i++) {
+        if(i <= val)
+            jQuery(".tx-webx-bookingemo .searchView .more .roomWrapper" + i).slideDown("fast");
+        else {
+            jQuery(".tx-webx-bookingemo .searchView .more .roomWrapper" + i).slideUp("fast");
+        }
+    }
+});
+/* searchview */
+
+/* priceSlider */
+jQuery(document).ready(function() {
+    jQuery(".tx-webx-bookingemo .searchView #priceSliderWidget" ).slider({
+        orientation: "horizontal",
+        range: true,
+        min: jQuery("#priceSliderWidget").data('min'),
+        max: jQuery("#priceSliderWidget").data('max'),
+        step: 10,
+        values: [ 20, jQuery("#priceSliderWidget").data('max') ],
+        slide: function (event, ui) {
+            jQuery("#priceSliderText").text("€ " + ui.values[0] + " - € " + ui.values[1]);
+            jQuery("#priceSliderMin").val(ui.values[0]);
+            jQuery("#priceSliderMax").val(ui.values[1]);
+        },
+        change: function(event, ui){
+            jQuery(this).closest("form").submit();
+        }
+    });
+    jQuery("#priceSliderText").text( "€ " + jQuery("#priceSliderWidget").slider("values", 0) +
+        " - € " + jQuery("#priceSliderWidget").slider("values", 1));
+    jQuery("#priceSliderMin").val(jQuery("#priceSliderWidget").slider("values", 0));
+    jQuery("#priceSliderMax").val(jQuery("#priceSliderWidget").slider("values", 1));
+});
+/* priceSlider */
+
+
+/* listview */
+jQuery(document).ready(function(){
+    jQuery(".tx-webx-bookingemo .loadPriceServiceProvider").each(function(){
+        var uid = jQuery(this).data("uid");
+        xajax_ajaxCalcPriceFromServiceProvider(uid);
+    });
+    jQuery(".tx-webx-bookingemo .loadCheapestPriceServiceProvider").each(function(){
+        var uid = jQuery(this).data("uid");
+        var singleprice = jQuery(this).data("single");
+        if (!singleprice) {
+            singleprice = 0;
+        }
+        xajax_ajaxCalcCheapestPriceFromServiceProvider(uid, singleprice);
+    });
+    jQuery(".tx-webx-bookingemo .loadPriceProduct").each(function(){
+        var uid = jQuery(this).data("uid");
+        xajax_ajaxCalcPriceFromProduct(uid, 'BB');
+    });
+});
+jQuery(".tx-webx-bookingemo .showMap").click(function(){
+    jQuery(".tx-webx-bookingemo .hideMap").removeClass("hidden");
+    jQuery(this).addClass("hidden");
+
+    if(jQuery("#ajaxGoogleMaps").hasClass("manualInit")) {
+        initialize();
+        if (navigator.geolocation)
+            navigator.geolocation.getCurrentPosition(setUserGeoLoation);
+        google.maps.event.addListenerOnce(map, 'idle', function(){
+            jQuery(".tx-webx-bookingemo .mapLoader").css({
+                width: jQuery("#map-canvas").outerWidth() + "px",
+                height: jQuery("#map-canvas").outerHeight() + "px"
+            });
+            jQuery(".tx-webx-bookingemo .mapLoader .loader").css({
+                "margin-top": ((jQuery("#map-canvas").height() - jQuery(".tx-webx-bookingemo .mapLoader .loader").height()) / 2) + "px"
+            });
+            if(jQuery("#ajaxGoogleMaps").hasClass("loadMarker")) {
+                jQuery(".tx-webx-bookingemo .mapLoader .loader").slideDown("fast");
+                xajax_ajaxGoogleMaps();
+            }
+        });
+        jQuery("#ajaxGoogleMaps").removeClass("manualInit");
+    }
+    jQuery("#ajaxGoogleMaps").slideDown("fast");
+});
+jQuery(".tx-webx-bookingemo .hideMap").click(function(){
+    jQuery(this).addClass("hidden");
+    jQuery(".tx-webx-bookingemo .showMap").removeClass("hidden");
+    jQuery("#ajaxGoogleMaps").slideUp("fast");
+});
+function callbackAjaxGoogleMaps(jsonUrl) {
+    jQuery.getJSON( "/typo3conf/ext/webx_bookingemo/Resources/Public/PHP/cacheLoader.php?file=" + jsonUrl, function( markerData ) {
+        var markers = [];
+        jQuery.each(markerData, function(i,item){
+            var myLatlng = new google.maps.LatLng(item['lat'],item['long']);
+            var marker = new google.maps.Marker({ id: item['id'], map: map, title: item['name'] , position: myLatlng });
+            var contentString = "";
+            contentString = "<div style='overflow: auto; width: 260px; height: 122px;'>";
+            contentString += "<div class='title'>" + item['name'] + "</div>";
+            contentString += "<div class='address' style='min-height:75px'>" + item['address'] + "</div>";
+            contentString += '<div class="image"></div>';
+            contentString += '<div class="infos">';
+            contentString += '<div class="details"><a class="emoButton" href="' + item['detailLink'] + '">Zur Unterkunft</a></div>';
+            contentString += '</div>';
+            contentString += "</div>";
+
+            var  infowindow = new google.maps.InfoWindow({
+                content: contentString
+            });
+
+            google.maps.event.addListener(marker, 'click', function() {
+                infowindow.open(map,marker);
+            });
+
+            markers.push(marker);
+        });
+        var markerCluster = new MarkerClusterer(map, markers);
+        jQuery(".tx-webx-bookingemo .mapLoader").slideUp("fast");
+    });
+}
+/* listview */
+
+/* details */
+jQuery(document).ready(function() {
+    initGammaGallery();
+
+    if(jQuery(".tx-webx-bookingemo .singleView .loadAvailabilities").length > 0)
+        jQuery(".tx-webx-bookingemo .singleView .loadAvailabilities").not(".showLoader").slick({
+            slidesToShow: 4,
+            slidesToScroll: 1,
+            arrows: true,
+            dots: false,
+            infinite: false,
+            prevArrow:"<button type='button' class='slick-prev pull-left'><i class='fas fa-chevron-left drop-shadow'></i></button>",
+            nextArrow:"<button type='button' class='slick-next pull-right'><i class='fas fa-chevron-right drop-shadow'></i></button>",
+            responsive: [
+                {
+                    breakpoint: 1024,
+                    settings: {
+                        slidesToShow: 3
+                    }
+                },
+                {
+                    breakpoint: 600,
+                    settings: {
+                        slidesToShow: 2
+                    }
+                },
+                {
+                    breakpoint: 480,
+                    settings: {
+                        slidesToShow: 1
+                    }
+                }
+            ]
+        });
+    if (typeof searchArrival !== 'undefined') {
+        if (jQuery(".tx-webx-bookingemo .singleView").length > 0 && searchArrival != "" && searchDeparture != "") {
+            searchArrival = searchArrival.split(".");
+            searchDeparture = searchDeparture.split(".");
+
+            if (searchArrival[0].indexOf("0") == 0)
+                searchArrival[0] = searchArrival[0].replace("0", "");
+            if (searchDeparture[0].indexOf("0") == 0)
+                searchDeparture[0] = searchDeparture[0].replace("0", "");
+
+            if (searchArrival[1].indexOf("0") == 0)
+                searchArrival[1] = searchArrival[1].replace("0", "");
+            if (searchDeparture[1].indexOf("0") == 0)
+                searchDeparture[1] = searchDeparture[1].replace("0", "");
+
+            jQuery("table[data-month=" + searchArrival[1] + "][data-year=" + searchArrival[2] + "] div[data-day=" + searchArrival[0] + "]").trigger("click");
+            jQuery("table[data-month=" + searchDeparture[1] + "][data-year=" + searchDeparture[2] + "] div[data-day=" + searchDeparture[0] + "]").trigger("click");
+        }
+    }
+});
+function initGammaGallery() {
+    if(jQuery(".gamma-container").length == 0)
+        return;
+    var GammaSettings = {
+        // order is important!
+        viewport : [ {
+            width : 1200,
+            columns : 5
+        }, {
+            width : 900,
+            columns : 4
+        }, {
+            width : 500,
+            columns : 3
+        }, {
+            width : 320,
+            columns : 2
+        }, {
+            width : 0,
+            columns : 2
+        } ]
+    };
+
+    Gamma.init( GammaSettings, fncallback );
+}
+
+function fncallback() {}
+
+jQuery(".tx-webx-bookingemo .singleView .calendar .available").on("click", function(){
+    var parent = jQuery(this).closest(".loadAvailabilities");
+    jQuery(this).toggleClass("taken");
+    if(parent.find(".start").length == 0)
+        jQuery(this).addClass("start");
+    else if(parent.find(".end").length == 0) {
+        jQuery(this).addClass("end");
+        var startFound = false;
+        var endFound = false;
+        parent.find("div.available").each(function(){
+            if(jQuery(this).hasClass("taken"))
+                jQuery(this).attr("title", "Ausgew�hlt").tooltipster({
+                    theme: 'tooltipster-wc',
+                    contentAsHTML: true
+                });
+            else
+                jQuery(this).attr("title", "Verf�gbar").tooltipster({
+                    theme: 'tooltipster-wc',
+                    contentAsHTML: true
+                });
+            if(jQuery(this).hasClass("start"))
+                startFound = true;
+            if(jQuery(this).hasClass("end"))
+                endFound = true;
+            if(startFound && !endFound)
+                jQuery(this).addClass("taken");
+        });
+    }
+});
+jQuery(".tx-webx-bookingemo .singleView .calendar .available").not(".taken").on("mouseenter mouseleave", function(){
+    jQuery(this).toggleClass("hover");
+});
+jQuery(".tx-webx-bookingemo .singleView .loadCompleteGallery .emoButton").click(function(){
+    jQuery(this).unbind().addClass("isLoading");
+    jQuery("#images .gamma-container").addClass("gamma-loading").html("");
+    xajax_ajaxLoadImages();
+});
+function serviceProviderLoadImagesCallback() {
+    Gamma.reset();
+    initGammaGallery();
+}
+/* details */
+
+/* checkout */
+function submitCheckoutForm() {
+    // check form is validated by h5validator
+    if (jQuery("#payment-form").h5Validate('allValid') == false) {
+        return false;
+    }
+
+    //check creditcard
+    var ccIdentifier = jQuery(".card-wrapper .card").prop("class").replace("card","").replace("identified","").replace("safari","").replace("ie-11","").replace("flipped","").trim();
+    if(jQuery("#paymentmethod option[data-indentifier=" + ccIdentifier + "]").length == 0) {
+        swal({
+            title: "Kreditkarte wird nicht leider unterstützt!",
+            type: "error"
+        });
+        return false;
+    } else {
+        jQuery("#paymentmethod").val(jQuery("#paymentmethod option[data-indentifier=" + ccIdentifier + "]").prop("value"));
+        swal({
+            title: "Bearbeite Bezahlung!",
+            text: "<img src='/typo3conf/ext/webx_bookingemo/Resources/Public/Images/ajax-loader_4.gif' /><style>.sweet-alert  .confirm { display:none; }</style>",
+            showConfirmButton: false,
+            html: true ,
+            type: "info"
+        });
+
+    }
+}
+
+/* if no payment provider is needed */
+function submitCheckoutForm_none() {
+    swal({
+        title: "Bearbeite Buchung!",
+        text: "<img src='/typo3conf/ext/webx_bookingemo/Resources/Public/Images/ajax-loader_4.gif' /><style>.sweet-alert  .confirm { display:none; }</style>",
+        showConfirmButton: false,
+        html: true ,
+        type: "info"
+    });
+}
+
+
+function checkoutResponse(json) {
+    console.log(json);
+    json = JSON.parse(json);
+
+    if(json.status == "success")
+        swal({
+                title: "Ihre Buchung war erfolgreich",
+                text: "",
+                type: "success",
+                confirmButtonText: "Bestellung abschlie�en"
+            },
+            function(isConfirm){
+                if (isConfirm) {
+                    document.location.href = jQuery("#summary_link").data("link");
+                }
+            }
+        );
+    else if(json.status == "error")
+        swal({
+            title: "Leider ist ein Fehler passiert!",
+            text: "Fehler: " + json.errorMessage,
+            type: "error",
+            confirmButtonText: "Daten bearbeiten"
+        });
+}
+/* checkout */
+
+/* Tooltipster */
+jQuery(document).ready(function(){
+    jQuery(".tooltipster").tooltipster({
+        theme: 'tooltipster-wc',
+        contentAsHTML: true,
+        interactive: true
+    });
+});
+
+/* search */
+/* 2015-09-16: narrow select with additional form:not(.noJS) --> takes no effect eg. on buchung-Search with form class='noJS' ... */
+jQuery(".tx-webx-bookingemo .searchView form:not(.noJsSubmit)").submit(function(e){
+    e.preventDefault();
+    // jQuery("html, body").animate({ scrollTop: jQuery(".tx-webx-bookingemo .listView").offset().top + "px" });
+    jQuery(".tx-webx-bookingemo .serviceProviderLoader .loader").slideDown("fast");
+    // jQuery("#serviceProviderResults").slideUp("fast").html("");
+
+    doFormRequestGeneric(jQuery(".tx-webx-bookingemo .searchView form"));
+
+    if(firstSearch) {
+        firstSearch = false;
+    } else {
+        jQuery.cookie("webxbookingemo_u_back", jQuery(".tx-webx-bookingemo .searchView form").serialize(), { expires : 0.01 });
+        jQuery.cookie("webxbookingemo_u_filter", jQuery(".tx-webx-bookingemo .emofilter form").serialize(), { expires : 0.01 });
+
+        jQuery.cookie('webxbookingemo_location', checksum(location.href), { expires : 0.01 });
+    }
+
+    jQuery.cookie("webxbookingemo_u_backpage", 1, { expires : 0.01 });
+    console.log(1);
+
+
+
+    jQuery(".loadServiceProviders").each(function() {
+        $(this).html('');
+        if(jQuery.cookie('webxbookingemo_location') == checksum(location.href)) {
+            EmoAjax_ajaxSearch(jQuery.cookie("webxbookingemo_u_back"), jQuery.cookie("webxbookingemo_u_filter"), 1, $(this).data());
+        } else {
+            EmoAjax_ajaxSearch(jQuery(".tx-webx-bookingemo .searchView form").serialize(),jQuery(".tx-webx-bookingemo .serviceproviderSorting").serialize(), 1, $(this).data());
+        }
+
+    });
+
+
+
+    jQuery(".loadMapServiceProviders").each(function() {
+        EmoAjax_ajaxMapSearch(jQuery(".tx-webx-bookingemo .searchView form").serialize(),jQuery(".tx-webx-bookingemo .serviceproviderSorting").serialize());
+    });
+    if ( map !== null ) EmoAjax_ajaxMapSearch(jQuery(".tx-webx-bookingemo .searchView form").serialize(),jQuery('#mapWEBX').data());
+});
+
+
+jQuery(".tx-webx-bookingemo .searchView .resetAll a").click(function(e){
+    e.preventDefault();
+    jQuery("html, body").animate({ scrollTop: jQuery(".tx-webx-bookingemo .listView").offset().top + "px" });
+    jQuery(".tx-webx-bookingemo .searchView input:checked").trigger("click")
+    jQuery(".tx-webx-bookingemo .searchView .outerWrapper.opened .head").trigger("click")
+    jQuery(".tx-webx-bookingemo .serviceProviderLoader .loader").slideDown("fast");
+    jQuery("#serviceProviderResults").slideUp("fast", function(){
+        jQuery(this).html("");
+    });
+    EmoAjax_ajaxSearch("resetAll");
+});
+
+
+
+function loadPrice() {
+    jQuery(".tx-webx-bookingemo .loadCheapestPriceServiceProvider").each(function(){
+        var uid = jQuery(this).data("uid");
+        var singleprice = jQuery(this).data("single");
+        if (!singleprice) {
+            singleprice = 0;
+        }
+
+        xajax_ajaxCalcCheapestPriceFromServiceProvider(uid, singleprice);
+    });
+
+}
+
+function updateprice() {
+    jQuery(".tx-webx-bookingemo .loadPriceServiceProvider").each(function(){
+        var uid = jQuery(this).data("uid");
+        xajax_ajaxCalcPriceFromServiceProvider(uid);
+    });
+
+}
+
+function ajaxCallbackServiceProviderFilter(mycnt) {
+
+    console.log("ajaxCallbackServiceProviderFilter " + mycnt);
+
+
+
+    jQuery(".tx-webx-bookingemo .listView h1 span").html(mycnt);
+    jQuery(".tx-webx-bookingemo .loader").slideUp("fast");
+    jQuery(".tx-wc-booking-emo-v2 .loader").slideUp("fast");
+    jQuery("#serviceProviderResults").slideDown("fast");
+
+
+
+
+    jQuery.fn.toggleClick = function(){
+
+        var functions = arguments ;
+
+        return this.click(function(){
+            var iteration = jQuery(this).data('iteration') || 0;
+            functions[iteration].apply(this, arguments);
+            iteration = (iteration + 1) % functions.length ;
+            jQuery(this).data('iteration', iteration);
+        });
+    };
+
+
+
+    jQuery(".moreDesc").toggleClick(function(){
+        jQuery(this).html(jQuery(this).data("less")).siblings(".complete").show();
+    }, function(){
+        jQuery(this).html(jQuery(this).data("more")).siblings(".complete").hide();
+
+    });
+
+    // rooms (eventhandler)
+    jQuery(".tx-webx-bookingemo .listView .roomButtonsWrapper").click(function(){
+        jQuery(this).toggleClass("roomsHidden");
+        jQuery(this).closest(".serviceProvider ").find(".rooms").toggleClass("roomsHidden");
+        if (!jQuery(this).hasClass("roomsHidden")) {
+            // maybe there is a prevois result
+            jQuery("#serviceProvider" +  jQuery(this).data("serviceprovider")).html("");
+
+            // enable loader
+            jQuery(".tx-webx-bookingemo .serviceProviders .loader").css("display","block");
+
+            // ga
+            ga('send', 'event', 'booking_emo', 'Zimmer anzeigen', jQuery(this).data("hotelname"));
+
+
+            // load rooms
+            xajax_ajaxLoadRooms(jQuery(this).data("serviceprovider"));
+        } else {
+            // when close disable loader
+            jQuery(".tx-webx-bookingemo .serviceProviders .loader").css("display","none");
+        }
+    });
+
+    // rooms - price (eventhandler)
+    jQuery(document).ready(function(){
+        jQuery(".tx-webx-bookingemo .loadPriceServiceProvider").each(function(){
+            var uid = jQuery(this).data("uid");
+            xajax_ajaxCalcPriceFromServiceProvider(uid);
+        });
+        jQuery(".tx-webx-bookingemo .loadPriceProduct").each(function(){
+            var uid = jQuery(this).data("uid");
+            xajax_ajaxCalcPriceFromProduct(uid, 'BB');
+        });
+    });
+
+    // tooltipster
+    jQuery(".tooltipster").tooltipster({
+        theme: 'tooltipster-wc',
+        contentAsHTML: true
+    });
+
+
+
+    if(jQuery(".tx-webx-bookingemo .searchView").length > 0) {
+        var r = [];
+
+        jQuery(".tx-webx-bookingemo .listView .serviceProviders .serviceProvider").each(function () {
+            r.push(jQuery(this).children(".innerWrap").data("feratelid"));
+        });
+        if (typeof nefos != "undefined") {
+            nefos.PageInstance.loadResources({
+                resourceForeignIds: r,
+                /* categoryIds: [4017], */
+                callback : function(resources2) {
+                    for (var j=0;j<resources2.length;j++) {
+                        nefos.PageInstance.addResourceToMap(resources2[j], true);
+                    }
+                    nefos.PageInstance.fitMapBounds(resources2);
+                    jQuery("#mapOverlay").hide();
+                }
+            });
+        };
+        //?
+        /*nefos.PageInstance.loadResources({
+            resourceForeignIds: r,
+            //categoryIds: [4017],
+            callback : function(resources2) {
+                for (var j=0;j<resources2.length;j++) {
+                    nefos.PageInstance.addResourceToMap(resources2[j], true);
+                }
+                nefos.PageInstance.fitMapBounds(resources2);
+                jQuery("#mapOverlay").hide();
+            }
+        });*/
+    }
+
+    // jQuery(".dceButton.normal.emoDetailButton a.emoButton-white").each( function() {
+    //     if( ids !== null )
+    //         $(this).attr("href",$(this).attr('href')+'?filter='+ids.join(','));
+    // });
+}
+
+function ajaxCallbackServiceProviderLoadMore(mycnt, selector) {
+    jQuery(".tx-webx-bookingemo .updateNumber").html(mycnt);
+    // console.log(mycnt);
+    jQuery('.loader').hide();
+    jQuery('.loadServiceProviders').slideDown('slow');
+    jQuery('#'+selector).slideDown('slow');
+
+    jQuery(document).ready(function(){
+        jQuery(".tooltipster").tooltipster({
+            theme: 'tooltipster-wc',
+            contentAsHTML: true,
+            interactive: true
+        });
+    });
+
+    jQuery(".dceButton.normal.emoDetailButton a.emoButton-white").each( function() {
+        if( ids !== null && !$(this).attr('href').includes('?filter')) {
+            $(this).attr("href",$(this).attr('href')+'?filter='+ids.join(','));
+        }
+    });
+    FclickCount();
+}
+/* search */
+
+/* event filter */
+//jQuery(document).ready(function(){
+//    if(jQuery(".tx-webx-bookingemo .eventFilterView").length > 0) {
+//        initDateSlider();
+//        xajax_ajaxLoadDateSlider();
+//    }
+//});
+
+
+jQuery(".tx-webx-bookingemo .eventFilterView .filterPart.expandable,.tx-webx-bookingemo .filterView .filterPart.expandable").click(function(){
+    var filterContent = jQuery(this).data("content");
+    jQuery(".tx-webx-bookingemo .eventFilterView .filterPart,.tx-webx-bookingemo .filterView .filterPart").not(this).find(".iconFlip").removeClass("rotate");
+    jQuery(this).find(".iconFlip").toggleClass("rotate");
+    jQuery(".tx-webx-bookingemo .eventFilterView .filterContent,.tx-webx-bookingemo .filterView .filterContent").not(".filterContent." + filterContent).slideUp("fast");
+    jQuery(".tx-webx-bookingemo .eventFilterView .filterContent." + filterContent).slideToggle("fast");
+    jQuery(".tx-webx-bookingemo .filterView .filterContent." + filterContent).slideToggle("fast");
+});
+jQuery(".tx-webx-bookingemo .eventFilterView .filterPart.hasInput .input-group-addon,.tx-webx-bookingemo .filterView .filterPart.hasInput .input-group-addon").click(function(){
+    jQuery(this).prev("input").focus();
+});
+jQuery(".tx-webx-bookingemo .eventFilterView .filterContents input,.tx-webx-bookingemo .filterView .filterContents input").change(function(){
+    var filterContent = jQuery(this).closest(".filterContent").data("content");
+    jQuery(".tx-webx-bookingemo .eventFilterView .filterPart.expandable[data-content=" + filterContent + "] .count").html(jQuery(this).closest(".filterContent").find("input:checked").length);
+    jQuery(".tx-webx-bookingemo .filterView .filterPart.expandable[data-content=" + filterContent + "] .count").html(jQuery(this).closest(".filterContent").find("input:checked").length);
+});
+
+
+jQuery(".tx-webx-bookingemo .eventFilterView form").submit(function(e) {
+    e.preventDefault();
+
+    doFormRequestGeneric(jQuery(".tx-webx-bookingemo .eventFilterView form"));
+
+    /* save cookie for back link */
+    // jQuery.cookie("webxbookingemo_e_back", jQuery(".tx-webx-bookingemo .eventFilterView form input[name*='filter']").serialize(), { expires : 0.01 });
+    // jQuery.cookie("webxbookingemo_e_filter", jQuery(".tx-webx-bookingemo .eventView .sortLinks form").serialize(), { expires : 0.01 });
+    if(firstSearch) {
+        firstSearch = false;
+    } else {
+        jQuery.cookie("webxbookingemo_e_back", jQuery(".tx-webx-bookingemo .eventFilterView form").serialize(), { expires : 0.01 });
+        jQuery.cookie("webxbookingemo_e_filter", jQuery(".tx-webx-bookingemo .eventFilterView form").serialize(), { expires : 0.01 });
+        // jQuery.cookie("webxbookingemo_e_backpage", page, { expires : 0.01 });
+        jQuery.cookie('webxbookingemo_location', checksum(location.href), { expires : 0.01 });
+    }
+    jQuery.cookie("webxbookingemo_e_pathname", window.location.pathname, { expires : 0.01, path: window.location.pathname });
+    jQuery.cookie("webxbookingemo_e_backpage", 1, { expires : 0.01 });
+
+    jQuery("#eventResults").html("");
+
+    jQuery(".loadEvents").each(function() {
+        $(this).html('');
+
+        if(jQuery.cookie('webxbookingemo_location') == checksum(location.href)) {
+            EmoAjax_ajaxReloadEvents(jQuery.cookie("webxbookingemo_e_back"), jQuery.cookie("webxbookingemo_e_filter"), 1, $(this).data());
+        } else {
+
+            EmoAjax_ajaxReloadEvents(jQuery(".tx-webx-bookingemo .eventFilterView form").serialize(), jQuery(".tx-webx-bookingemo .eventFilterView .sortLinks form").serialize(), 1, $(this).data());
+        }
+    });
+    jQuery(".loadMapEvents").each(function() {
+        if (map !== null) EmoAjax_ajaxReloadEventsMap(jQuery(".tx-webx-bookingemo .eventFilterView form").serialize(), jQuery(".tx-webx-bookingemo .eventFilterView .sortLinks form").serialize(), 1,$(this).data());
+    });
+});
+
+jQuery(".tx-webx-bookingemo .reset").click( function(e) {
+    // console.log("CLICKED");
+    if(jQuery(".tx-webx-bookingemo .eventFilterView form").length> 0 )
+        itms = jQuery(".tx-webx-bookingemo .eventFilterView form ." + $(this).data('cat') ).find(':' + $(this).data('itm'));
+    else if (jQuery(".tx-webx-bookingemo .infrastructureFilterView form").length > 0)
+        itms = jQuery(".tx-webx-bookingemo .infrastructureFilterView form ." + $(this).data('cat') ).find(':' + $(this).data('itm'));
+    else if (jQuery(".tx-webx-bookingemo .searchView form").length > 0)
+        itms = jQuery(".tx-webx-bookingemo .searchView form ." + $(this).data('cat') ).find(':' + $(this).data('itm'));
+
+    itms.prop('checked', false);
+    $(this).parent().remove();
+    shown = $('.fCurrent .fCTarget');
+    if( shown.length == 1 ) jQuery('.tx-webx-bookingemo .resetFilter').removeClass('filterSet');
+    // console.log("submitting");
+    $('.tx-webx-bookingemo .emofilters form').submit();
+
+});
+
+jQuery(".tx-webx-bookingemo .resetFilter").click( function(e) {
+    var checkboxes = null;
+    if(jQuery(".tx-webx-bookingemo .eventFilterView form").length> 0 )
+        checkboxes = jQuery(".tx-webx-bookingemo .eventFilterView form").find(':checkbox');
+    else if (jQuery(".tx-webx-bookingemo .infrastructureFilterView form").length > 0)
+        checkboxes = jQuery(".tx-webx-bookingemo .infrastructureFilterView form").find(':checkbox');
+    else if (jQuery(".tx-webx-bookingemo .searchView form").length > 0)
+        checkboxes = jQuery(".tx-webx-bookingemo .searchView form").find(':checkbox');
+
+    if (checkboxes) checkboxes.prop('checked', false);
+
+    if(jQuery(".tx-webx-bookingemo .eventFilterView form").length> 0 )
+        options = jQuery(".tx-webx-bookingemo .eventFilterView form").find('select').find(':selected');
+    if(jQuery(".tx-webx-bookingemo .infrastructureFilterView form").length> 0 )
+        options = jQuery(".tx-webx-bookingemo .infrastructureFilterView form").find('select').find(':selected');
+    if(jQuery(".tx-webx-bookingemo .searchView form").length> 0 )
+        options = jQuery(".tx-webx-bookingemo .searchView form").find('select').find(':selected');
+
+    if(options) options.prop('selected',false);
+
+    if(jQuery(".tx-webx-bookingemo .eventFilterView form").length> 0 )
+        textFields = jQuery(".tx-webx-bookingemo .eventFilterView form").find(':text');
+    if(jQuery(".tx-webx-bookingemo .infrastructureFilterView form").length> 0 )
+        textFields = jQuery(".tx-webx-bookingemo .infrastructureFilterView form").find(':text');
+    if(jQuery(".tx-webx-bookingemo .searchView form").length> 0 )
+        textFields = jQuery(".tx-webx-bookingemo .searchView form").find(':text');
+
+
+    if(textFields) textFields.val('');
+    textFields.trigger('change');
+
+    jQuery('.tx-webx-bookingemo .fCurrent .rst').remove();
+    jQuery('.tx-webx-bookingemo .fCurrent .resetFilter').show();
+    jQuery('.tx-webx-bookingemo .resetFilter').removeClass('filterSet');
+    // $('.search-choice-close').trigger('click');
+    $('.tx-webx-bookingemo .chosen-multiselect').trigger('chosen:updated');
+
+    $('.tx-webx-bookingemo .emofilters .filterform').submit();
+});
+
+
+function createReset(itm, form, check ) {
+    elems = form.find(itm);
+    allCats = [];
+    checked=false;
+    /*elems.each( function() {
+        cat = $(this).closest('.fWAcc').data('name');
+        cls = $(this).closest('.fWAcc').attr('class').split(' ')[1];
+        if($.inArray(cat,allCats)=== -1) allCats.push(cat);
+        if($(this).is(':' + check) && $('.fCurrent .' + cls).length == 0 ) {
+            console.log(cls);
+            console.log(cat);
+            jQuery('.tx-webx-bookingemo .resetFilter').addClass('filterSet');
+            jQuery('.fCurrent').append('<span class="fCTarget"><span class="' + cls + '" data-itm="' + itm.replace(':','') + '" data-cls="' + cls + '" data-cat="' + cat + '">' + cat + '</span></span>')
+            jQuery(".tx-webx-bookingemo .fCTarget ." + cls).click( function(e) {
+                itms = form.find('.' + jQuery(this).data('cls')).find(itm);
+                itms.prop(check, false);
+                $(this).parent().remove();
+                shown = $('.fCurrent .fCTarget');
+                $('.search-choice-close').trigger('click');
+                if( shown.length == 1 ) jQuery('.tx-webx-bookingemo .resetFilter').removeClass('filterSet');
+                $('.tx-webx-bookingemo .emofilters form').submit();
+            });
+        }
+    });*/
+
+    elems.each( function() {
+        cls = $(this).attr('class').split(' ')[0];
+        if(jQuery(this).is(':' + check)) {
+            if($(this).data('name') && $('.fCurrent .' + cls).length == 0 ) {
+                jQuery('.fCurrent .resetFilter').hide();
+                jQuery('.fCurrent').append('<span class="fCTarget"><span class="rst '+cls+'"  data-itm="' + itm.replace(':','') + '" data-cls="' +  cls + '" data-cat="' +  $(this).data('name') + '">' + $(this).data('name') + '</span></span>');
+                jQuery('.fCurrent .rst').click( function(e) {
+                    form.find('.' + $(this).data('cls')).prop(check, false);
+                    // console.log($(this).data('cls'));
+                    console.log(form.find('.' + cls).prop(check));
+                    $(this).parent().remove();
+                    shown = $('.fCurrent .fCTarget');
+                    $('.tx-webx-bookingemo .chosen-multiselect').trigger('chosen:updated');
+                    if( shown.length == 1 ) {
+                        jQuery('.tx-webx-bookingemo .resetFilter').removeClass('filterSet');
+                        jQuery('.tx-webx-bookingemo .fCurrent .resetFilter').show();
+                    }
+                    $('.tx-webx-bookingemo .emofilters form').submit();
+                })
+            }
+        } else if ($('.fCurrent .' + cls).length == 1 ) {
+                $('.fCurrent .' + cls).parent().remove();
+                shown = $('.fCurrent .fCTarget');
+                if( shown.length == 1 ) {
+                    jQuery('.tx-webx-bookingemo .resetFilter').removeClass('filterSet');
+                    jQuery('.tx-webx-bookingemo .fCurrent .resetFilter').show();
+                }
+
+            }
+    });
+    allChecked=false;
+    for ( i in allCats ) {
+        checkedCat = false;
+        toCheck = form.find('.' + allCats[i] + ' ' + itm);
+        toCheck.each(function() {
+            if( $( this ).is( ':' + check )) checkedCat=true;
+        });
+        if(checkedCat) {
+            allChecked = true;
+        } else {
+            jQuery(".tx-webx-bookingemo .fCTarget ." + allCats[i]).remove();
+        }
+
+    }
+    return allChecked;
+}
+
+function doFormRequestGeneric( form ) {
+    checkboxes = form.find(':checkbox');
+    options = form.find('option');
+    allCheck = false;
+
+    if( createReset( 'option',form,'selected' )) allCheck = true;
+    if( createReset( ':checkbox',form,'checked' )) allCheck = true;
+
+
+    if(!allCheck) {
+        jQuery('.tx-webx-bookingemo .resetFilter').removeClass('filterSet');
+        jQuery('.tx-webx-bookingemo .reset').remove();
+    }
+
+
+
+
+}
+
+
+
+
+
+jQuery(".tx-webx-bookingemo .infrastructureFilterView form").submit(function(e){
+    e.preventDefault();
+
+    doFormRequestGeneric( jQuery(".tx-webx-bookingemo .infrastructureFilterView form") );
+
+    jQuery('.paginator').html('');
+    jQuery(".tx-webx-bookingemo .infrastructures .loader").slideDown("fast");
+
+    if(firstSearch) {
+        firstSearch = false;
+    } else {
+        jQuery.cookie("webxbookingemo_i_back", jQuery(".tx-webx-bookingemo .infrastructureFilterView form").serialize(), { expires : 0.01 });
+        jQuery.cookie("webxbookingemo_i_filter", jQuery(".tx-webx-bookingemo .infrastructureFilterView .sortLinks form").serialize(), { expires : 0.01 });
+        jQuery.cookie("webxbookingemo_i_backpage", 1, { expires : 0.01 });
+        jQuery.cookie('webxbookingemo_location', checksum(location.href), { expires : 0.01 });
+    }
+
+    jQuery(".loadInfrastructures").each(function() {
+        jQuery(this).html('');
+
+        if (jQuery.cookie('webxbookingemo_location') == checksum(location.href)) {
+            firstSearch = false;
+            EmoAjax_ajaxReloadInfrastructures(jQuery.cookie("webxbookingemo_i_back"), jQuery.cookie("webxbookingemo_i_filter"), jQuery.cookie("webxbookingemo_i_backpage"), $(this).data());
+        } else {
+            EmoAjax_ajaxReloadInfrastructures(jQuery(".tx-webx-bookingemo .infrastructureFilterView form").serialize(), jQuery(".tx-webx-bookingemo .infrastructureFilterView .sortLinks form").serialize(), 1,$(this).data());
+        }
+
+    });
+    if ( typeof map != 'undefined' ) EmoAjax_ajaxReloadInfrastructureMap(jQuery(".tx-webx-bookingemo .infrastructureFilterView form").serialize());
+    if( typeof maps != 'undefined' ) {
+        for(i in maps) {
+            console.log($('#mapWEBX-'+maps[i]).data());
+            EmoAjax_ajaxReloadInfrastructureMap(jQuery(".tx-webx-bookingemo .infrastructureFilterView form").serialize(),$('#mapWEBX-'+maps[i]).data());
+        }
+    }
+});
+
+
+
+
+jQuery(".tx-webx-bookingemo .infrastructureSortingView form").submit(function(e){
+    e.preventDefault();
+    var cid = $(this).data('cid');
+    console.log(cid);
+    sortingForm = this;
+    jQuery("#infrastructureResults").html("");
+    jQuery(".tx-webx-bookingemo .loader").slideDown("fast");
+    jQuery(".loadInfrastructures").each(function() {
+        if(cid == $(this).data('cid') || cid == undefined) {
+            $(this).html('');
+            EmoAjax_ajaxReloadInfrastructures(jQuery(".tx-webx-bookingemo .infrastructureFilterView form").serialize(), jQuery(sortingForm).serialize(), 1, $(this).data());
+        }
+    });
+});
+
+jQuery(".tx-webx-bookingemo form.serviceproviderSorting").submit(function(e){
+    e.preventDefault();
+
+    // jQuery("#serviceProviderResults").slideUp("fast").html("");
+    jQuery(".tx-webx-bookingemo .serviceProviderList .loader").slideDown("fast");
+
+    //EmoAjax_ajaxSearch(jQuery(".tx-webx-bookingemo .searchView form.filterform").serialize(), jQuery(".tx-webx-bookingemo form.serviceproviderSorting").serialize(), 1);
+    // EmoAjax_ajaxSearch(jQuery(".tx-webx-bookingemo .searchView form").serialize(), jQuery(".tx-webx-bookingemo form.serviceproviderSorting").serialize(), 1);
+
+    jQuery(".loadServiceProviders").each(function() {
+        jQuery(this).slideUp("fast").html("");
+        EmoAjax_ajaxSearch(jQuery(".tx-webx-bookingemo .searchView form").serialize(), jQuery(".tx-webx-bookingemo form.serviceproviderSorting").serialize(), 1,$(this).data());
+    });
+
+});
+
+
+
+function initDateSlider() {
+    if(jQuery(".eventFilterView [name*=filterFrom], .filterView [name*=filterFrom]").val() == "" || jQuery(".eventFilterView [name*=filterTo], .filterView [name*=filterTo]").val() == "") {
+        jQuery(".tx-webx-bookingemo .filterView .dateSlider, .tx-webx-bookingemo .eventFilterView .dateSlider").slideUp("fast");
+        return;
+    }
+
+    jQuery(".tx-webx-bookingemo .filterView .dateSlider, .tx-webx-bookingemo .eventFilterView .dateSlider").slideDown("fast");
+
+    jQuery(".tx-webx-bookingemo .eventFilterView .dateSlider").slick({
+        infinite:false,
+        slidesToShow: 3,
+        slidesToScroll: 1,
+        arrows: true,
+        centerMode: true,
+        prevArrow: "<button type='button' class='slick-prev pull-left'><i class='fas fa-chevron-left drop-shadow'></i></button>",
+        nextArrow: "<button type='button' class='slick-next pull-right'><i class='fas fa-chevron-right drop-shadow'></i></button>"
+    });
+
+}
+
+function ajaxCallbackEventFilter(count) {
+    jQuery(".tx-webx-bookingemo .updateNumber").html(count);
+    jQuery(".tx-webx-bookingemo .loader").hide();
+    jQuery("#eventResults").show();
+
+
+    jQuery(".dceButton.normal.emoDetailButton a.emoButton-white").each( function() {
+        if( ids !== null )
+            $(this).attr("href",$(this).attr('href')+'?filter='+ids.join(','));
+    });
+}
+
+function ajaxCallbackInfrastructureFilter(count) {
+    console.log("dope");
+    jQuery(".tx-webx-bookingemo .updateNumber").html(count);
+    // jQuery(".tx-webx-bookingemo .updateNumber." + selectorId.replace('#','')).html(formatNumber(count));
+    jQuery(".tx-webx-bookingemo .loader").slideUp("fast");
+    jQuery(".tx-wc-booking-emo-v2 .loader").slideUp("fast");
+    // jQuery("#" + selectorId).slideDown("fast");
+    jQuery(".dceButton.normal.emoDetailButton a.emoButton").each( function() {
+        if( ids !== null  && !$(this).attr('href').includes('?filter='))
+            $(this).attr("href",$(this).attr('href')+'?filter='+ids.join(','));
+    });
+}
+
+function ajaxCallbackShopitemFilter(count) {
+    jQuery(".tx-webx-bookingemo .updateNumber").html(formatNumber(count));
+    jQuery(".tx-webx-bookingemo .loader").slideUp("fast");
+    jQuery(".tx-wc-booking-emo-v2 .loader").slideUp("fast");
+    jQuery("#shopitemResults").slideDown("fast");
+    console.log("done");
+}
+
+function ajaxCallbackPackagesFilter(count) {
+    console.log(count);
+    jQuery(".tx-webx-bookingemo .listView h1 span").html(formatNumber(count));
+    jQuery(".tx-webx-bookingemo .loader").slideUp("fast");
+    jQuery(".tx-wc-booking-emo-v2 .loader").slideUp("fast");
+    jQuery("#packageResults").slideDown("fast");
+}
+
+
+jQuery(".tx-webx-bookingemo .eventSortingView form").submit(function(e){
+    e.preventDefault();
+    console.log("here you are");
+    console.log(jQuery(".tx-webx-bookingemo .eventSortingView form"));
+    jQuery("#eventResults").html("");
+    jQuery(".tx-webx-bookingemo .loader").slideDown("fast");
+
+    jQuery(".loadEvents").each(function() {
+        $(this).html('');
+        EmoAjax_ajaxReloadEvents(jQuery(".tx-webx-bookingemo .eventFilterView form").serialize(), jQuery(".tx-webx-bookingemo .eventSortingView form").serialize(), 1,$(this).data());
+    });
+});
+
+jQuery(".tx-webx-bookingemo .shopitemSortingView form").submit(function(e){
+    e.preventDefault();
+    console.log(jQuery(".tx-webx-bookingemo .shopitemSortingView form"));
+    jQuery("#eventResults").html("");
+    jQuery(".tx-webx-bookingemo .loader").slideDown("fast");
+    EmoAjax_ajaxReloadEvents(jQuery(".tx-webx-bookingemo .shopitemFilterView form").serialize(), jQuery(".tx-webx-bookingemo .shopitemSortingView form").serialize(), 1);
+});
+
+
+
+/* shopItems */
+jQuery(".tx-webx-bookingemo .shopitemFilterView form").submit(function(e){
+    e.preventDefault();
+    console.log(jQuery(this).serialize());
+    jQuery("#shopitemResults").slideUp("fast");
+    jQuery(".tx-webx-bookingemo .loader").slideDown("fast");
+    jQuery("#shopitemResults").html("");
+    EmoAjax_ajaxReloadShopitems(jQuery(this).serialize());
+});
+
+function ajaxCallbackShopitemFilter(count) {
+    jQuery(".tx-webx-bookingemo .updateNumber").html(formatNumber(count));
+    jQuery(".tx-webx-bookingemo .loader").slideUp("fast");
+    jQuery("#shopitemResults").slideDown("fast");
+}
+
+jQuery(".tx-webx-bookingemo .shopitemSortingView form").submit(function(e){
+    e.preventDefault();
+    jQuery("#shopitemResults").slideUp("fast");
+    jQuery(".tx-webx-bookingemo .loader").slideDown("fast");
+    jQuery("#shopitemResults").html("");
+    EmoAjax_ajaxReloadShopitems('', jQuery(this).serialize());
+});
+
+
+/* eventlist */
+jQuery("#eventsQuickSort").change(function(){
+    EventPaginate(1);
+});
+
+jQuery(".tx-webx-bookingemo .eventView .gridLayout span").click(function(){
+    jQuery(".tx-webx-bookingemo .eventView #gridLayout").val(jQuery(this).data("value"));
+    jQuery(".tx-webx-bookingemo .eventView .gridLayout span").removeClass("current");
+    jQuery(this).addClass("current");
+
+    EventPaginate(1);
+});
+
+/* shopItems */
+jQuery(".tx-webx-bookingemo .shopItemDetails .shopping button").click(function(){
+    var lang = jQuery(".tx-webx-bookingemo .shopItemDetails .shopping select").val();
+    var uid2 = jQuery(".tx-webx-bookingemo .shopItemDetails .shopping input").val();
+    var title = jQuery(".tx-webx-bookingemo .shopItemDetails .title h1").html() + " (" + lang + ")";
+    var i = 1;
+    var uid = uid2 + "_1_" + lang;
+    while(jQuery("#shoppingCardItemFor" + uid).length > 0) {
+        uid = uid2 + "_" + i + "_" + lang;
+        i++;
+    }
+
+    jQuery(".tx-webx-bookingemo .shoppingCardView .emptyMessage").removeClass("show").addClass("hide");
+    var item = "#shoppingCardItemFor" + uid;
+    jQuery(".tx-webx-bookingemo .shoppingCardView ul").append("<li id='shoppingCardItemFor" + uid + "' data-product='" + uid + "' class='loading future'><span class='imgPlaceholder'></span>" + title + "<div class='clearfix'></div></li>");
+    setTimeout(function(){
+        jQuery(item).removeClass("future");
+    },100);
+
+    xajax_ajaxModifyShoppingCard(uid, "shopItem");
+});
+/* shopItems */
+
+/*packages*/
+jQuery(".tx-webx-bookingemo .packageFilterView form").submit(function(e){
+    e.preventDefault();
+    jQuery("#packageResults").slideUp("fast", function(){
+        jQuery(this).html("");
+    });
+    jQuery(".tx-webx-bookingemo .loader").slideDown("fast");
+    EmoAjax_ajaxReloadPackages(jQuery(this).serialize());
+});
+
+/* packages */
+
+
+function formatNumber(num) {
+    if (num) {
+        return num.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.");
+    }
+}
+
+function bookingaction() {
+    jQuery(".shoppingcardinfo .shoppingcardinforooms").change(function() {
+        var pruductid = jQuery(this).closest( ".shoppingcardinfo" ).data("productid");
+        jQuery("#shoppingcardInfo" + pruductid).empty();
+
+        for (i = 1; i <= jQuery(this).val(); i++) {
+
+            var roominfo = $("<div class=\"shoppingcard_item\">");
+            var label = $("<div class=\"zimmer\">Zimmer "+ i + ":</div>");
+            var diverw = $("<div></div>");
+            var divkid = $("<div></div>");
+
+            label.appendTo(roominfo);
+
+            var labelerw = $("<label>Anz. Erwachsene:</label>");
+
+            labelerw.appendTo(diverw);
+
+            var erw = jQuery("<select class=\"emoButton\" id=\"shoppingcardInfo_adult"+ pruductid +"\" name=\"shoppingcardInfo_adult"+ pruductid +"\" />");
+            for(var val in ['kein', 1,2,3,4]) {
+                $("<option />", {value: val, text: val}).appendTo(erw);
+            }
+
+            erw.appendTo(diverw);
+
+            diverw.appendTo(roominfo);
+
+
+            var label = $("<label>Anz. Kinder:</label>");
+            label.appendTo(divkid);
+
+            var kid = jQuery("<select class=\"emoButton\" id=\"shoppingcardInfo_child"+ pruductid +"\" name=\"shoppingcardInfo_child"+ pruductid +"\" />");
+            for(var val in ['kein', 1,2,3,4]) {
+                $("<option />", {value: val, text: val}).appendTo(kid);
+            }
+
+
+            kid.appendTo(divkid);
+            divkid.appendTo(roominfo);
+
+            roominfo.appendTo("#shoppingcardInfo" + pruductid );
+        }
+    });
+}
+
+
+function ajaxLoadRooms_cb(spid) {
+    jQuery(".tx-webx-bookingemo .listView .loader").css("display","none");
+
+    //single view room details accordion
+    jQuery('.detailRoomList .showRooms').click(function() {
+        jQuery(this).parent().addClass('RoomShow');
+    });
+    jQuery('.detailRoomList .hideRooms').click(function() {
+        jQuery(this).parent().removeClass('RoomShow');
+    });
+
+    //bookingaction();
+    //alert(spid);
+}
+
+
+function quickbooking_multi(formid) {
+    var book = jQuery("#form" + formid).serialize();
+    xajax_ajaxQuickBook(book);
+}
+
+function ajaxCallbackQuickBooking(status, errmsg) {
+    if (status) {
+        // fire ga event
+        ga('send', 'event', 'booking_emo', 'click', 'book now');
+        // redirect to shoppingcard
+        document.location.href = "/urlaub/biken/shoppingcart/";
+    } else {
+        sweetAlert("Zimmerauswahl so nicht m�glich", errmsg, "error");
+    }
+
+}
+
+
+/* from buchungsstrecke.js  - start */
+
+jQuery(".tx-webx-bookingemo .layout.contentElement .filterWrapper input").change(function(){
+    jQuery(this).closest("form").submit();
+});
+
+jQuery(document).ready(function() {
+      /* Autocompleter for ServiceProvider Name Search */
+    //jQuery(function() {
+    //    jQuery( "#searchServiceProvider" ).autocomplete({
+    //        source:  "/typo3conf/ext/webx_bookingemo/Resources/Public/PHP/gen_serviceproviderlist.php",
+    //        minLength: 3,
+    //
+    //    });
+    //});
+
+    jQuery(".tx-webx-bookingemo .detailRoomList").each(function () {
+        //console.log("loadrooms");
+        //jQuery('.loader').slideDown('fast');
+        jQuery(".tx-webx-bookingemo  .loader").slideDown("fast");
+        //jQuery(".tx-webx-bookingemo  .loader").css("display","block");
+        EmoAjax_ajaxLoadRoomsServiceProvider(jQuery(this).data("serviceprovider"));
+
+    });
+
+    //ROOM ACCORDEON
+    jQuery(".tx-webx-bookingemo  .roomtoggle").click(function(){
+        if( jQuery(this).parents('.room').hasClass("roomopen") ) {
+            jQuery(this).parents('.roomHeader').next(".roomContent").hide();
+            jQuery(this).parents('.room').removeClass("roomopen");
+        } else {
+            jQuery(".roomContent").hide();
+            jQuery(".room").removeClass("roomopen");
+            jQuery(this).parents('.room').addClass("roomopen");
+            jQuery(this).parents('.roomHeader').next(".roomContent").slideDown();
+        }
+    });
+
+    //ROOMGALLERY 2019
+     jQuery('.slickRoomGallery').slick({
+      lazyLoad: 'ondemand',
+      prevArrow:"<div class='slick-prev'><div class='generalArrow'></div></div>",
+      nextArrow:"<div class='slick-next'><div class='generalArrow'></div></div>"
+    });
+
+    //ROOMS LIGHTBOX 2019
+    jQuery('.roomgalleryItem:not(.slick-cloned)').fancybox();
+    jQuery('.roomgalleryItem.slick-cloned').removeAttr('data-fancybox');
+    jQuery('.roomgalleryItem.slick-cloned').on('click', function(e) {
+        e.preventDefault();
+        jQuery(jQuery(this).data('item')).not('.slick-cloned').trigger('click');
+    });
+
+    //SINGLE VIEW SLIDERS
+
+    // Mag bei Infra sonst nicht...
+	jQuery(".lightbox").fancybox();
+
+     jQuery('.slickDetailGalleryItem').slick({
+      slidesToShow: 1,
+      slidesToScroll: 1,
+      arrows: true,
+      fade: true,
+      adaptiveHeight: true,
+      lazyLoad: 'ondemand',
+      prevArrow:"<button type='button' class='slick-prev pull-left'><i class='fas fa-chevron-left drop-shadow'></i></button>",
+      nextArrow:"<button type='button' class='slick-next pull-right'><i class='fas fa-chevron-right drop-shadow'></i></button>"
+    });
+
+
+
+    jQuery('.slickDetailGallery').slick({
+        dots: true,
+        slidesToShow: 1,
+        slidesToScroll: 1,
+        arrows: true,
+        fade: true,
+        autoplay:true,
+        lazyLoad: 'ondemand',
+         adaptiveHeight: true,
+         prevArrow:"<button type='button' class='slick-prev pull-left'><i class='fas fa-chevron-left drop-shadow'></i></button>",
+        nextArrow:"<button type='button' class='slick-next pull-right'><i class='fas fa-chevron-right drop-shadow'></i></button>",
+        customPaging: function(slick,index) {
+            return slick.$slides.eq(index).find('img').prop('outerHTML');
+        }
+    });
+    jQuery('.slickDetailGallery, .slickDetailGalleryItem').show();
+
+    // ENQUIRY FORM 2019
+    jQuery('.form-item.inputField').on('click touch', function() {
+        jQuery(this).addClass('act');
+        jQuery(this).find('input').focus();
+    });
+    jQuery('.form-item.inputField input').on('blur', function() {
+        if (jQuery(this).val() == '') {
+            jQuery(this).parent().removeClass('act');
+        }
+    });
+    jQuery('.selectField select').chosen({
+        disable_search: true
+    });
+
+    // wooos?
+    // jQuery('.loader').slideDown('fast');
+
+// var len = jQuery('.tx-webx-bookingemo .singleView .tabs').children().length;
+// if(len > 0){
+    // jQuery('.tx-webx-bookingemo .singleView .tabs .tab').width( 100/len + '%');
+// }
+
+    // jQuery('.detailRoomsTab').each(function() {
+    // jQuery(this).css('cursor','default');
+    // });
+    // jQuery('.detailPackagesTab').each(function() {
+    // jQuery(this).css('cursor','pointer');
+    // });
+    // jQuery('.detailRoomsTab').click(function() {
+    // jQuery('.detailPackagesTab').removeClass('active').css('cursor','pointer');
+    // jQuery(this).addClass('active').css('cursor','default');
+    // jQuery('.detailPackages').addClass('hidden');
+    // jQuery('.detailRooms').removeClass('hidden');
+    // });
+    // jQuery('.detailPackagesTab').click(function() {
+    // jQuery('.detailRoomsTab').removeClass('active').css('cursor','pointer');
+    // jQuery(this).addClass('active').css('cursor','default');
+    // jQuery('.detailRooms').addClass('hidden');
+    // jQuery('.detailPackages').removeClass('hidden');
+    // });
+
+    jQuery(".tx-webx-bookingemo .searchView .searchWrapper2 .searchArrival").change(function(){
+        //alert(jQuery(".tx-webx-bookingemo .searchView .searchWrapper2 .searchArrival").val());
+        var changeDateTo = jQuery(".tx-webx-bookingemo .searchView .searchWrapper2 span#traveldates_tag").data("changed");
+        if (changeDateTo != 0) {
+            //var dateTo = calculateDepartureDate(jQuery(".tx-webx-bookingemo .searchView .searchWrapper2 .searchArrival").val(), 7);
+            var dateTo = calculateDepartureDate(jQuery(".tx-webx-bookingemo .searchView .searchWrapper2 .searchArrival").val(), 7, "default", jQuery(".tx-webx-bookingemo .searchView .searchWrapper2 .searchDeparture").val());
+            if (dateTo) {
+                jQuery(".tx-webx-bookingemo .searchView .searchWrapper2 .searchDeparture").val(dateTo);
+            }
+        }
+        jQuery(".tx-webx-bookingemo .searchView .searchWrapper2 span#traveldates_tag").data("changed","1");
+        //var diffDays = calculateDatesDifference(jQuery(".tx-webx-bookingemo .searchView .searchWrapper2 .searchArrival").val(), jQuery(".tx-webx-bookingemo .searchView .searchWrapper2 .searchDeparture").val());
+        //jQuery(".tx-webx-bookingemo .searchView .searchWrapper2 #searchNights").html(diffDays);
+    });
+
+    jQuery(".tx-webx-bookingemo .singleView .availabilityForm .searchArrival").change(function(){
+        var changeDateTo = jQuery(".tx-webx-bookingemo .singleView .availabilityForm span#traveldates_tag").data("changed");
+        if (changeDateTo != 0) {
+            //var dateTo = calculateDepartureDate(jQuery(".tx-webx-bookingemo .singleView .availabilityForm .searchArrival").val(), 7, "onlyIfDateFromGreater", jQuery(".tx-webx-bookingemo .singleView .availabilityForm .searchDeparture").val());
+            //var dateTo = calculateDepartureDate(jQuery(".tx-webx-bookingemo .singleView .availabilityForm .searchArrival").val(), 7);
+            var dateTo = calculateDepartureDate(jQuery(".tx-webx-bookingemo .singleView .availabilityForm .searchArrival").val(), 7, "default", jQuery(".tx-webx-bookingemo .singleView .availabilityForm .searchDeparture").val());
+            if (dateTo) {
+                jQuery(".tx-webx-bookingemo .singleView .availabilityForm .searchDeparture").val(dateTo);
+            }
+        }
+        jQuery(".tx-webx-bookingemo .singleView .availabilityForm span#traveldates_tag").data("changed","1");
+        var diffDays = calculateDatesDifference(jQuery(".tx-webx-bookingemo .singleView .availabilityForm .searchArrival").val(), jQuery(".tx-webx-bookingemo .singleView .availabilityForm .searchDeparture").val());
+        jQuery(".tx-webx-bookingemo .singleView .availabilityForm #searchNights").html(diffDays);
+    });
+
+    jQuery(".tx-webx-bookingemo .singleView .availabilityForm .searchDeparture").change(function(){
+        var diffDays = calculateDatesDifference(jQuery(".tx-webx-bookingemo .singleView .availabilityForm .searchArrival").val(), jQuery(".tx-webx-bookingemo .singleView .availabilityForm .searchDeparture").val());
+        jQuery(".tx-webx-bookingemo .singleView .availabilityForm #searchNights").html(diffDays);
+    });
+
+    /*
+     jQuery(".tx-webx-bookingemo .singleView .availabilityForm .submitsearchdates").click(function() {
+     //alert("neue suche...");
+     jQuery(".tx-webx-bookingemo .singleView .roomsHidden").html('');
+     EmoAjax_ajaxLoadRoomsServiceProvider(jQuery(".tx-webx-bookingemo .singleView .detailRoomList").data("serviceprovider"), jQuery("#roomSearchArrival").val(), jQuery("#roomSearchDeparture").val());
+     });
+     */
+
+
+    jQuery('.possiblePaymentMethods input').click(function() {
+        var paymentMethod = jQuery(this).val();
+        jQuery('.prePayment div').addClass('hidden');
+        jQuery('.prePayment .paymentMethod_' + paymentMethod).removeClass('hidden');
+    });
+
+
+    // why?
+    // ajaxCallbackServiceProviderFilter();
+
+
+    // TrustYou:
+    if( document.getElementById('trustYouWidgetScore') != null && typeof ty_hotel != 'undefined') {
+        if (ty_hotel == "") return;
+        //alert(ty_language);
+        if(undefined == typeof ty_language) {
+            ty_language = "de";
+        }
+        //xajax_ajaxGetTrustYouSeal('trustYouWidgetScore', ty_hotel, 'l');
+        trustYouWidgetScore();
+        //jQuery('#ty > section').html('asdfasdf');
+        jQuery.getJSON('/'+ty_hotel+'/meta_review.json?lang='+ty_language, function(data) {
+            var content = '';
+            for( var key in data.response.category_list ) {
+                content += '<div><div class="name">'+data.response.category_list[key].category_name+'</div><div class="progress"><div class="progress-bar progress-bar-success" style="width:'+data.response.category_list[key].score+'%"></div></div><div class="text">'+data.response.category_list[key].short_text+'</div></div>';
+            }
+            jQuery('#highlight').append(content);
+
+        });
+        jQuery.getJSON('/'+ty_hotel+'/sources.json?lang='+ty_language, function(data) {
+            jQuery("<link/>", {
+                rel: "stylesheet",
+                type: "text/css",
+                href: "https://api.trustyou.com/static/css/source-icons.css?v=v5.25.1"
+            }).appendTo("head");
+
+            var content = '';
+            for( var key in data.response ) {
+                if( data.response[key].score != null )
+                    content += '<div><span class="source-icon source-icon-'+data.response[key].source_id+'"></span><div class="name">'+data.response[key].source_name+'</div><div class="score">'+data.response[key].score+'</div></div>';
+            }
+            jQuery('#source').append(content);
+
+        });
+        jQuery('#bigWidget').append(jQuery('<iframe src="https://api.trustyou.com/hotels/'+ty_hotel+'/trust_score_distribution.html?lang='+ty_language+'" allowtransparency="true" frameborder="0" height="300" scrolling="no" width="260"></iframe>'));
+        jQuery.getJSON('/'+ty_hotel+'/reviews.json?lang_list=["de"]', function(data) {
+            console.log(data);
+
+            var content = '';
+            for( var key in data.response.review_list ) {
+                content +=
+                    '<div class="clearfix">' +
+                    '<div class="score">'+data.response.review_list[key].score+'<span class="scoresmal"> /100</span></div>' +
+                    '<div class="nameWrap">' +
+                    '<div class="source"><span class="source-icon source-icon-'+data.response.review_list[key].source_id+'"></span>'+data.response.review_list[key].source_name+'</div>' +
+                    '<div class="date">'+data.response.review_list[key].created+'</div>' +
+                    '<div class="author">'+data.response.review_list[key].author+'</div>' +
+                    '</div>' +
+                    '<div class="textWrap">';
+                if (data.response.review_list[key].title) {
+                    content +=
+                        '<h3>'+data.response.review_list[key].title+'</h3>';
+                }
+                content +=
+                    '<div class="text">'+data.response.review_list[key].text+'</div></div>' +
+                    '</div>';
+            }
+            jQuery('#reviews').append(content);
+
+        });
+    } else {
+        jQuery('[aria-controls="ty"]').hide();
+    }
+
+       /* filterresp(); */
+
+});
+
+jQuery(window).bind('resize orientationchange', function() {
+    if( document.getElementById('trustYouWidgetScore') != null && typeof ty_hotel != 'undefined' ) {
+        trustYouWidgetScore();
+    }
+       /* filterresp(); */
+});
+
+
+
+
+function trustYouWidgetScore() {
+
+    return;
+    var ty_size = ty_size || "m";
+
+    ww = document.body.clientWidth;
+    if( ww < 720 && ty_size == "m" )
+        ty_size = "s";
+    else if( ty_size != "m" )
+        ty_size = "m";
+
+    var url = 'https://api.trustyou.com/hotels/'+ty_hotel+'/seal.html?lang='+ty_language+'&size='+ty_size;
+    var sealiFrame = jQuery('<iframe src="'+url+'" allowtransparency="true" frameborder="0" height="56" scrolling="no" width="205"></iframe>');
+    if( jQuery('#trustYouWidgetScore > iframe').prop('src') != url )
+        jQuery('#trustYouWidgetScore').html(sealiFrame);
+}
+
+
+
+
+function calculateDatesDifference(dateFrom, dateTo) {
+    //var val2 = jQuery(".tx-webx-bookingemo .singleView .availabilityForm .searchDeparture").val();
+    dateFrom = dateFrom.split(".");
+    var objDateFrom = new Date(dateFrom[1]+"/"+dateFrom[0]+"/"+dateFrom[2]);
+    dateTo = dateTo.split(".");
+    var objDateTo = new Date(dateTo[1]+"/"+dateTo[0]+"/"+dateTo[2]);
+    var timeDiff = Math.abs(objDateTo.getTime() - objDateFrom.getTime());
+    var diffDays = Math.ceil(timeDiff / (1000 * 3600 * 24));
+    return diffDays;
+}
+
+//function calculateDepartureDate(dateFrom, nrOfNights, method="default", dateTo) {
+function calculateDepartureDate(dateFrom, nrOfNights, method, dateTo) {
+    dateFrom = dateFrom.split(".");
+    objDateFrom = new Date(dateFrom[1]+"/"+dateFrom[0]+"/"+dateFrom[2]);
+    switch(method) {
+        case "noChange":
+            return;
+        case "onlyIfDateFromGreater":
+            dateTo = dateTo.split(".");
+            var objDateTo = new Date(dateTo[1]+"/"+dateTo[0]+"/"+dateTo[2]);
+            if (objDateFrom < objDateTo) {
+                return;
+            }
+            break;
+        default:
+        //default
+    }
+    // add nrOfNights to dateObject:
+    objDateFrom.setDate(objDateFrom.getDate() + nrOfNights);
+    var dateTo = objDateFrom.getDate() + "." + (objDateFrom.getMonth()+1) + "." + objDateFrom.getFullYear();
+    return dateTo;
+}
+
+function changeTravelDates() {
+    jQuery(".tx-webx-bookingemo .singleView .detailRoomList").html('');
+    var date1 = jQuery("#roomSearchArrival").val();
+    var date2 = jQuery("#roomSearchDeparture").val();
+    jQuery(".tx-webx-bookingemo input.searchArrival").val(date1);
+    jQuery(".tx-webx-bookingemo input.searchDeparture").val(date2);
+    var diffDays = calculateDatesDifference(jQuery(".tx-webx-bookingemo .singleView .availabilityForm .searchArrival").val(), jQuery(".tx-webx-bookingemo .singleView .availabilityForm .searchDeparture").val());
+    jQuery(".tx-webx-bookingemo #searchViewNights").html(diffDays);
+    EmoAjax_ajaxLoadRoomsServiceProvider(jQuery(".tx-webx-bookingemo .singleView .detailRoomList").data("serviceprovider"), jQuery("#roomSearchArrival").val(), jQuery("#roomSearchDeparture").val());
+}
+
+function emo_loadnext() {
+    jQuery(".tx-webx-bookingemo .searchView form").submit();
+}
+
+function ajaxLoadRoomsServiceProvider_cb() {
+    //console.log("rooms load done");
+    jQuery(".tx-webx-bookingemo .loader").slideUp("fast");
+
+
+    //single view room details accordion
+    jQuery('.detailRoomList .showRooms').click(function() {
+        jQuery(this).parent().addClass('RoomShow');
+    });
+    jQuery('.detailRoomList .hideRooms').click(function() {
+        jQuery(this).parent().removeClass('RoomShow');
+        //
+        //// reinitalize slick
+        //jQuery(".slick-initialized").each(function() {
+        //    console.log("penis");
+        //    jQuery(this).removeClass("slick-initialized");
+        //    jQuery(this).slick();
+        //
+        //
+        //});
+
+
+
+    });
+
+    jQuery('.slickRoomGallery').slick({
+      lazyLoad: 'progressive',
+      prevArrow:"<button type='button' class='slick-prev pull-left'><i class='fas fa-chevron-left drop-shadow'></i></button>",
+      nextArrow:"<button type='button' class='slick-next pull-right'><i class='fas fa-chevron-right drop-shadow'></i></button>"
+    });
+
+    jQuery(".tx-webx-bookingemo .singleView .loadAvailabilities.showLoader").each(function(){
+        xajax_ajaxLoadAvailabilities(jQuery(this).data("productuid"), jQuery(this).data("serviceuid"));
+    });
+
+    jQuery('.loadAvailabilities').slick({
+        slidesToShow: 3,
+        slidesToScroll: 1,
+        arrows:true,
+        dots: false,
+        infinite: true,
+        prevArrow:"<button type='button' class='slick-prev pull-left'><i class='fas fa-chevron-left drop-shadow'></i></button>",
+        nextArrow:"<button type='button' class='slick-next pull-right'><i class='fas fa-chevron-right drop-shadow'></i></button>",
+        responsive: [
+            {
+                breakpoint: 720,
+                settings: {
+                    slidesToShow: 1
+                }
+            }
+        ]
+    });
+
+    jQuery(".tx-webx-bookingemo .singleView .room .addShoppingCard button").click(function() {
+        var uid = jQuery(this).data("productid") + "_1";
+        var i = 1;
+        while(jQuery("#shoppingCardItemFor" + uid).length > 0) {
+            uid = jQuery(this).data("productid") + "_" + i;
+            i++;
+        }
+        //jQuery(".tx-webx-bookingemo .detachedShoppingcart").animate({"margin-top": "-25%"});
+        jQuery(".tx-webx-bookingemo .shoppingCardView .emptyMessage").removeClass("show").addClass("hide");
+        var item = "#shoppingCardItemFor" + uid;
+
+        jQuery(".tx-webx-bookingemo .shoppingCardView ul").append("<li id='shoppingCardItemFor" + uid + "' data-product='" + uid + "' class='loading future'><span class='imgPlaceholder'></span>" + jQuery(this).data("title") + "<div class='clearfix'></div></li>");
+        if(jQuery(".tx-webx-bookingemo .detachedShoppingcart").length > 0) {
+            jQuery(".tx-webx-bookingemo .detachedShoppingcart").animate({"margin-top": "-10%"});
+            jQuery(".tx-webx-bookingemo .detachedShoppingcart .checkout").addClass("checkout--active");
+        }
+
+        setTimeout(function() {
+            jQuery(item).removeClass("future");
+        },100);
+
+        var dataruid = jQuery(this).data("ruid");
+        var mealcode = jQuery(".tx-webx-bookingemo .singleView #" + dataruid + " input[type=radio][name=mealcode]:checked").val();
+        console.log(dataruid + " -- " + mealcode);
+
+        var searchLine = jQuery(this).data("searchline");
+        if (searchLine) {
+            EmoAjax_ajaxModifyShoppingCard(uid, 'product', Number(searchLine), mealcode);
+        } else {
+            EmoAjax_ajaxModifyShoppingCard(uid);
+        }
+    });
+
+    /* singleview */
+    jQuery(".tx-webx-bookingemo .singleView .room .anfragen").click(function(e){
+        e.preventDefault();
+        jQuery(".tx-webx-bookingemo  .tabs .tab[data-tab=enquiry]").trigger("click");
+        jQuery("#enquiry .rooms").show();
+        var parent = jQuery(this).closest(".room");
+        jQuery("html, body").animate({ scrollTop: jQuery("#enquiry").offset().top + "px" });
+        jQuery("#enquiry .rooms ul").append("<li class='future'><input type='hidden' name='tx_webxbookingemo_main[newEnquiry][relProducts][]' value='" + parent.data("uid") + "'/><div class='image'>" + parent.find(".image").html() + "</div><div class='emoButton glyphicon glyphicon-trash removeRoom pull-right'></div><div class='infos'>" + parent.find(".infos .roomTitle").html() + "</div><div class='clearfix'></div></li>")
+        setTimeout(function(){
+            jQuery("#enquiry .rooms ul li").last().removeClass("future");
+        },100);
+
+        rebindSingle();
+    });
+
+    function rebindSingle() {
+        jQuery("#enquiry ul li .removeRoom").unbind("click").click(function(){
+            var item = jQuery(this).closest("li");
+            item.addClass("past");
+            setTimeout(function(){
+                item.remove();
+                if(jQuery("#enquiry .rooms ul li").length == 0)
+                    jQuery("#enquiry .rooms").hide();
+            },500);
+        });
+    }
+
+    jQuery(".tooltipster").tooltipster({
+        theme: 'tooltipster-wc',
+        contentAsHTML: true
+    });
+
+    jQuery('input[type=radio][name=mealcode]').change(function() {
+        var dataruid = jQuery(this).closest('form').data('ruid');
+        var val = jQuery(".tx-webx-bookingemo .singleView #" + dataruid + " input[type=radio][name=mealcode]:checked").val();
+        //console.log(val);
+        //console.log(dataruid);
+        /*
+         jQuery(".tx-webx-bookingemo .singleView #" + dataruid + " .displayPriceProduct").hide();
+         jQuery(".tx-webx-bookingemo .singleView #" + dataruid + " .mealcode_" + val).show();
+         */
+        jQuery(".tx-webx-bookingemo .singleView #" + dataruid + " .displayPriceProduct").removeClass("bold");
+        jQuery(".tx-webx-bookingemo .singleView #" + dataruid + " .displayPriceProduct.mealcode_" + val).addClass("bold");
+    });
+    jQuery("form.mealcodeRadio").each(function (index, element) {
+        var dataruid = jQuery(this).data("ruid");
+        console.log(dataruid);
+        jQuery("#" + dataruid + " input[type=radio][name=mealcode]:first").attr("checked", true).trigger("change");
+    });
+
+    jQuery('.detailRoomsTab').each(function() {
+        jQuery(this).css('cursor','default');
+    });
+    jQuery('.detailPackagesTab').each(function() {
+        jQuery(this).css('cursor','pointer');
+    });
+    jQuery('.detailRoomsTab').click(function() {
+        jQuery('.detailPackagesTab').removeClass('active').css('cursor','pointer');
+        jQuery(this).addClass('active').css('cursor','default');
+        jQuery('.detailPackages').addClass('hidden');
+        jQuery('.detailRooms').removeClass('hidden');
+    });
+    jQuery('.detailPackagesTab').click(function() {
+        jQuery('.detailRoomsTab').removeClass('active').css('cursor','pointer');
+        jQuery(this).addClass('active').css('cursor','default');
+        jQuery('.detailRooms').addClass('hidden');
+        jQuery('.detailPackages').removeClass('hidden');
+    });
+
+}
+
+function ExpiredShoppingCart() {
+    swal({
+            title: "Fehler!",
+            text: "Dein Warenkorb ist leider abgelaufen.",
+            showConfirmButton: false,
+            html: true ,
+            type: "error"
+        },
+        function() {
+            location.reload();
+        });
+}
+
+//function filterresp() {
+//    if (jQuery(window).width() <= 720) {
+//      jQuery('.tx-webx-bookingemo .searchView .searchWrapper2 h3').nextAll().hide();
+//      jQuery('.tx-webx-bookingemo .searchView.minisearchview .filterWrapper h3').nextAll().hide();
+//      jQuery('.tx-webx-bookingemo .searchView .searchWrapper2 h3').click(function() {
+//          jQuery(this).nextAll().toggle();
+//          jQuery(this).toggleClass('minusbefore');
+//      });
+//      jQuery('.tx-webx-bookingemo .searchView.minisearchview .filterWrapper h3').click(function() {
+//          jQuery(this).nextAll().toggle();
+//          jQuery(this).toggleClass('minusbefore');
+//      });
+//  }else{
+//      jQuery('.tx-webx-bookingemo .searchView .searchWrapper2 h3').nextAll().show()
+//      jQuery('.tx-webx-bookingemo .searchView.minisearchview .filterWrapper h3').nextAll().show();
+//  }
+//}
+
+if (jQuery(window).width() <= 720) {
+    jQuery(".tx-webx-bookingemo .searchView.minisearchview .filterWrapper h3").click(function() {
+        if (jQuery(this).hasClass("active")) {
+            jQuery(this).parents().find('.active').removeClass("active");
+            jQuery(this).parents().children('.mobiletoggle').slideUp();
+
+        } else {
+            jQuery(this).next().slideToggle();
+            jQuery(this).addClass("active");
+            jQuery(this).parents().children('.mobiletoggle').slideDown();
+        }
+    });
+
+    jQuery(".tx-webx-bookingemo .searchView.minisearchview .searchWrapper2 h3").click(function() {
+        if (jQuery(this).hasClass("active")) {
+            jQuery(this).parents().find('.active').removeClass("active");
+            jQuery('.searchWrapper2 .mobiletoggle').slideUp();
+
+
+        } else {
+            jQuery(this).next().slideToggle();
+            jQuery(this).addClass("active");
+            jQuery('.searchWrapper2 .mobiletoggle').slideDown();
+        }
+
+    });
+
+}
+
+
+/* end from buchungsstrecke.js */
+
+function sendEnquiryController() {
+    swal({
+        title: "Anfrage wird gesendet",
+        text: "<img src='/typo3conf/ext/webx_bookingemo/Resources/Public/Images/ajax-loader_2.gif' /><style>.sweet-alert  .confirm { display:none; }</style>",
+        showConfirmButton: false,
+        html: true ,
+        type: "info"
+    });
+    EmoAjax_ajaxDoEnquiry(jQuery("#newEnquiry").serialize());
+}
+
+function sendEnquiryController_cb(r) {
+    json = r;
+    console.log(json);
+    if(json.status == "success") {
+        swal({
+                title: "Anfrage wurde gesendet",
+                text: "",
+                type: "success",
+                confirmButtonText: json.buttontext
+            },
+            function (isConfirm) {
+                if (isConfirm) {
+                    document.location.href = $('#newEnquiry').data('thxurl');
+                }
+            }
+        );
+    } else if(json.status == "error")
+        swal({
+            title: "Leider ist ein Fehler passiert!",
+            text: "Fehler: " + json.errorMessage,
+            type: "error",
+            confirmButtonText: "Daten bearbeiten"
+        });
+}
+
+// TRACKING
+
+// search button
+jQuery(".tx-webx-bookingemo .submitsearch").click(function(){
+    ga('send', 'event', "Buchungsstrecke Suche", "Klick Unterkunft Finden", 1);
+});
+
+
+// filter
+jQuery(".tx-webx-bookingemo .filterWrapper input").each (function() {
+    jQuery(this).click(function() {
+        try {
+            ga('send', 'event', 'Buchungsstrecke Filter', jQuery(this).data("group"), jQuery(this).data("name"));
+        } catch (e) {
+            console.log("404 - Analytics not found");
+        }
+    });
+});
+
+// detailview
+jQuery(".tx-webx-bookingemo .singleView .tabs .tab").each (function() {
+    jQuery(this).click(function() {
+        ga('send', 'event', jQuery.trim(jQuery(".tx-webx-bookingemo h1").html()), "Klick Tab " + jQuery(this).data("tab"));
+    });
+});
+
+jQuery(".tx-webx-bookingemo .singleView .btnmail").click(function() {
+    ga('send', 'event', jQuery.trim(jQuery(".tx-webx-bookingemo h1").html()), "Klick Button Mail");
+});
+
+jQuery(".tx-webx-bookingemo .singleView .btnphone").click(function() {
+    ga('send', 'event', jQuery.trim(jQuery(".tx-webx-bookingemo h1").html()), "Klick Button Telefon");
+});
+
+jQuery(".tx-webx-bookingemo .singleView .btnurl").click(function() {
+    ga('send', 'event', jQuery.trim(jQuery(".tx-webx-bookingemo h1").html()), "Klick Button Url");
+});
+
+
+jQuery(".tx-webx-bookingemo .shoppingCardView  .checkout__option").click(function() {
+    ga('send', 'event', jQuery.trim(jQuery(".tx-webx-bookingemo h1").html()), "Klick checkout");
+});
+
+
+function FclickCount() {
+
+    //Detailseite
+    jQuery(document).on("click touch", '.serviceprovider_detail', function(e) {
+
+        var originator = "INNSBRUCK";
+        var company = "WSB7H569YE";
+        var salesChannelId = "BB556229-E7B1-4F21-9C6A-2BEA7120BF5A";
+        var id = jQuery(this).closest("[data-feratelid]").data("feratelid");
+
+        var url = "https://interface.deskline.net/DSI/ClickCount.asmx/TrackCountClicks?Originator=" + originator + "&Company=" + company + "&DBCode=IBK&SalesChannelId=" + salesChannelId + "&ItemID=" + id + "&CountType=SPDetail";
+
+        if (jQuery(this).data("FclickCount") != 'true' ) {
+            $.ajax({
+                url: "https://www.innsbruck.info/typo3conf/ext/webx_bookingemo/Resources/Public/PHP/feratelHelper.php",
+                type: "POST",
+                data: {
+                    url: url
+                },
+            });
+        } else {
+            console.log('prevent double click');
+        }
+
+        jQuery(this).data("FclickCount", 'true');
+
+    });
+
+    //Email-Klick
+    jQuery(document).on('click touch','.serviceprovider_email' ,function() {
+    // jQuery('.serviceprovider_email').on('click', function () {
+
+
+        var originator = "INNSBRUCK";
+        var company = "WSB7H569YE";
+        var salesChannelId = "BB556229-E7B1-4F21-9C6A-2BEA7120BF5A";
+
+        var id = jQuery(this).closest("[data-feratelid]").data("feratelid");
+
+        var url = "https://interface.deskline.net/DSI/ClickCount.asmx/TrackCountClicks?Originator=" + originator + "&Company=" + company + "&DBCode=IBK&SalesChannelId=" + salesChannelId + "&ItemID=" + id + "&CountType=SPEmail";
+
+        if (jQuery(this).data("FclickCount") != 'true' ) {
+            $.ajax({
+                url: "https://www.innsbruck.info/typo3conf/ext/webx_bookingemo/Resources/Public/PHP/feratelHelper.php",
+                type: "POST",
+                data: {
+                    url: url
+                },
+            });
+        } else {
+            console.log('prevent double click');
+        }
+
+        jQuery(this).data("FclickCount", 'true');
+
+
+    });
+
+    //Webseite Klick
+    jQuery(document).on('click touch','.serviceprovider_urlplain' ,function() {
+    // jQuery('.serviceprovider_urlplain').on('click', function () {
+
+
+        var originator = "INNSBRUCK";
+        var company = "WSB7H569YE";
+        var salesChannelId = "BB556229-E7B1-4F21-9C6A-2BEA7120BF5A";
+        var id = jQuery(this).closest("[data-feratelid]").data("feratelid");
+
+        var url = "https://interface.deskline.net/DSI/ClickCount.asmx/TrackCountClicks?Originator=" + originator + "&Company=" + company + "&DBCode=IBK&SalesChannelId=" + salesChannelId + "&ItemID=" + id + "&CountType=SPURL";
+
+        if (jQuery(this).data("FclickCount") != 'true' ) {
+            $.ajax({
+                url: "https://www.innsbruck.info/typo3conf/ext/webx_bookingemo/Resources/Public/PHP/feratelHelper.php",
+                type: "POST",
+                data: {
+                    url: url
+                },
+            });
+        } else {
+            console.log('prevent double click');
+        }
+
+        jQuery(this).data("FclickCount", 'true');
+
+
+    });
+
+    //Webseite Klick
+    jQuery(document).on('click touch','.serviceprovider_url' ,function() {
+    // jQuery('.serviceprovider_url').on('click', function () {
+
+
+        var originator = "INNSBRUCK";
+        var company = "WSB7H569YE";
+        var salesChannelId = "BB556229-E7B1-4F21-9C6A-2BEA7120BF5A";
+        var id = jQuery(this).closest("[data-feratelid]").data("feratelid");
+
+        var url = "https://interface.deskline.net/DSI/ClickCount.asmx/TrackCountClicks?Originator=" + originator + "&Company=" + company + "&DBCode=IBK&SalesChannelId=" + salesChannelId + "&ItemID=" + id + "&CountType=SPURL";
+
+        if (jQuery(this).data("FclickCount") != 'true' ) {
+            $.ajax({
+                url: "https://www.innsbruck.info/typo3conf/ext/webx_bookingemo/Resources/Public/PHP/feratelHelper.php",
+                type: "POST",
+                data: {
+                    url: url
+                },
+            });
+        } else {
+            console.log('prevent double click');
+        }
+
+        jQuery(this).data("FclickCount", 'true');
+    });
+
+
+    //Phone Klick
+    jQuery(document).on('click touch','.serviceprovider_phone' ,function() {
+    // jQuery('.serviceprovider_phone').on('click', function () {
+
+        var originator = "INNSBRUCK";
+        var company = "WSB7H569YE";
+        var salesChannelId = "BB556229-E7B1-4F21-9C6A-2BEA7120BF5A";
+        var id = jQuery(this).closest("[data-feratelid]").data("feratelid");
+
+        var url = "https://interface.deskline.net/DSI/ClickCount.asmx/TrackCountClicks?Originator=" + originator + "&Company=" + company + "&DBCode=IBK&SalesChannelId=" + salesChannelId + "&ItemID=" + id + "&CountType=SPPhone";
+
+        if (jQuery(this).data("FclickCount") != 'true' ) {
+            $.ajax({
+                url: "https://www.innsbruck.info/typo3conf/ext/webx_bookingemo/Resources/Public/PHP/feratelHelper.php",
+                type: "POST",
+                data: {
+                    url: url
+                },
+            });
+        } else {
+            console.log('prevent double click');
+        }
+
+        jQuery(this).data("FclickCount", 'true');
+
+    });
+}
+// end TRACKING
+
+
+/* new helper triggers */
+function doSelectUnique(elem) {
+    if (jQuery(elem).filter("[class*='unique-']").length > 0) {
+        var active = elem;
+        jQuery(elem.className.split(/\s+/)).each(function(index, value) {
+            var cur = value.split(/\-+/);
+            if (cur[0] == "unique") {
+                jQuery("div." + cur[1] + ", select." + cur[1]).removeClass('active');
+                jQuery(active).addClass('active');
+                jQuery("div." + cur[1] + ", select." + cur[1]).not('.active').val("0");
+            }
+        });
+    }
+}
+
+function findMaxValue(element) {
+    var maxValue = undefined;
+    $('option', element).each(function() {
+        var val = $(this).attr('value');
+        val = parseInt(val, 10);
+        if (maxValue === undefined || maxValue < val) {
+            maxValue = val;
+        }
+    });
+    return maxValue;
+}
+
+
+function findMinValue(element) {
+    var minValue = undefined;
+    $('option', element).each(function() {
+        var val = $(this).attr('value');
+        val = parseInt(val, 10);
+        if (minValue === undefined || minValue > val) {
+            minValue = val;
+        }
+    });
+    return minValue;
+}
+
+jQuery(".tx-webx-bookingemo .click2submit").click(function() {
+    jQuery(this).closest('form').submit();
+});
+
+
+jQuery(".tx-webx-bookingemo .change2submit").change(function() {
+    doSelectUnique(this);
+    jQuery(this).closest('form').submit();
+});
+
+jQuery(".tx-webx-bookingemo .change2submit").on('keyup', function(e) {
+    if(e.which == 13) {
+        doSelectUnique(this);
+        jQuery(this).closest('form').submit();
+    }
+});
+
+jQuery(".tx-webx-bookingemo .type2submit").keyup(function() {
+    jQuery(this).closest('form').submit();
+});
+
+jQuery(".emoplusminus .emominus").click(function() {
+    var myelem = jQuery(jQuery(this).data('id'));
+    var min = findMinValue(myelem);
+    if (myelem.length > 0) {
+        if (myelem.val() > min) {
+            myelem.val(myelem.val() - 1);
+            jQuery(myelem).trigger("change");
+
+            /* Update Label */
+            if (jQuery(".emoplusminusText").length > 0) {
+                jQuery(this).parent().parent().closest('div').find(".emoplusminusText").html(myelem.find(":selected").text());
+            }
+        }
+    }
+});
+
+
+jQuery(".emoplusminus .emoplus").click(function() {
+    var myelem = jQuery(jQuery(this).data('id'));
+    var max = findMaxValue(myelem);
+    if (myelem.length > 0) {
+        if (myelem.val() < max) {
+            myelem.val(parseInt(myelem.val(),10) + 1);
+            jQuery(myelem).trigger("change");
+
+            /* Update Label */
+            if (jQuery(".emoplusminusText").length > 0) {
+                jQuery(this).parent().parent().find(".emoplusminusText").html(myelem.find(":selected").text());
+            }
+        }
+    }
+});
+
+/* new helper triggers - END */
+
+$('.toggleFilter').click( function(e) {
+    var skipped = false;
+    $('.searchView').slideToggle('slow', function() {
+        if (!skipped) {skipped = !skipped; return;}
+        else if($('.searchView').is(":visible") )  {
+            // $('.topFilter').animate({top:'10%'});
+            // $('.leftFilter').animate({top:'10%'});
+            $({rotation: 180}).animate({rotation: 360}, {duration: 450,easing: 'linear',step: function () {$('.toggleFilter span').css({transform: 'rotate(' + this.rotation + 'deg)'});}});
+            console.log("shown");
+        } else {
+            console.log("hidden");
+            console.log(window.innerWidth);
+            if(window.innerWidth<=823) {
+                // $('.topFilter').animate({top:'8.5%'});
+                // $('.leftFilter').animate({top:'8.5%'});
+            } else {
+                console.log("not mobile");
+                // $('.topFilter').animate({top:'1%'});
+                // $('.leftFilter').animate({top:'1%'});
+            }
+            $({rotation: 0}).animate({rotation: 180}, {duration: 450,easing: 'linear',step: function () {$('.toggleFilter span').css({transform: 'rotate(' + this.rotation + 'deg)'});}});
+        }
+
+
+    });
+});
+
+/*$('.chlist').click( function() {
+    $('.fListView div').removeClass('active');
+    $(this).addClass('active');
+    $('.listGridMapView .list').show();
+    $('.listGridMapView .gridView').hide();
+    $('.listGridMapView .map').hide();
+})
+
+$('.chgrid').click( function() {
+    $('.fListView div').removeClass('active');
+    $(this).addClass('active');
+    $('.listGridMapView .gridView').show();
+    $('.listGridMapView .list').hide();
+    $('.listGridMapView .map').hide();
+})
+$('.chmap').click( function() {
+    $('.fListView div').removeClass('active');
+    $(this).addClass('active');
+    $('.listGridMapView .map').show();
+    jQuery(".loadMapServiceProviders").each(function() {
+        if (map === null ) map = new Map($(this).data('latlong'),$(this).data('zoom'),$(this).data('minzoom'),$(this).data('maxzoom'), 'map-canvas');
+
+        if( jQuery(".tx-webx-bookingemo .searchView form").serialize().length > 0 )
+            EmoAjax_ajaxMapSearch(jQuery(".tx-webx-bookingemo .searchView form").serialize(),jQuery(".tx-webx-bookingemo .serviceproviderSorting").serialize());
+        else EmoAjax_ajaxMapSearch();
+    });
+    jQuery(".loadMapEvents").each(function() {
+        if (map === null ) map = new Map($(this).data('latlong'),$(this).data('zoom'),$(this).data('minzoom'),$(this).data('maxzoom'), 'map-canvas');
+        if(jQuery(".tx-webx-bookingemo .eventFilterView form").length > 0 )
+            EmoAjax_ajaxReloadEventsMap(jQuery(".tx-webx-bookingemo .eventFilterView form").serialize(), jQuery(".tx-webx-bookingemo .eventFilterView .sortLinks form").serialize(), 1);
+        else EmoAjax_ajaxReloadEventsMap();
+    });
+
+    jQuery(".loadMapInfrastructures").each(function() {
+        if (map === null ) map = new Map($(this).data('latlong'),$(this).data('zoom'),$(this).data('minzoom'),$(this).data('maxzoom'), 'map-canvas');
+        console.log(jQuery(".tx-webx-bookingemo .infrastructureFilterView form").length);
+        if(jQuery(".tx-webx-bookingemo .infrastructureFilterView form").length > 0) {
+            console.log("beep");
+            EmoAjax_ajaxReloadInfrastructureMap(jQuery(".tx-webx-bookingemo .infrastructureFilterView form").serialize(), jQuery(".tx-webx-bookingemo .infrastructureFilterView .sortLinks form").serialize(), 1);
+        }
+        else EmoAjax_ajaxReloadInfrastructureMap();
+    });
+
+    $('.listGridMapView .list').hide();
+    $('.listGridMapView .gridView').hide();
+})*/
+
+
+jQuery(".EMOreplaceHeader").each(function () {
+    jQuery("#header").html(jQuery(this).html());
+});
+
+jQuery('body').on('click','.share', function() {
+    window.open('https://www.facebook.com/sharer/sharer.php?u='+jQuery(this).data('detail'),'','width=600,height=400');
+});
+
+// jQuery('body').on('click', function(e) {
+//     share = jQuery('.share path');
+//     if (share.is(e.target) && share.has(e.target).length === 0 ) {
+//             window.open('https://www.facebook.com/sharer/sharer.php?u=' + jQuery(e.target).closest('.share').data('detail'),'','width=600,height=400');
+//     }
+// });
+
+jQuery('.classification.arrow-down').click(function() {
+    $(this).parents('.fWAccContent').animate({scrollTop:$(this).parents('.fWAccContent')[0].scrollTop+150},150);
+})
+
+jQuery('.tx-webx-bookingemo .singleView .singleViewContent a').attr('target','_blank');
+
+
+
+
+jQuery('.chgrid').click(function() {
+    jQuery('.grid .dTTImage').each(function() {
+        jQuery(this).height(Math.ceil(jQuery(this).width()));
+    });
+});

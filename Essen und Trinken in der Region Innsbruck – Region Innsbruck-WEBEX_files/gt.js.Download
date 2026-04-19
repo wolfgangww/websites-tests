@@ -1,0 +1,3321 @@
+var $hx_exports = typeof exports != "undefined" ? exports : typeof window != "undefined" ? window : typeof self != "undefined" ? self : this;
+(function ($global) { "use strict";
+var $estr = function() { return js_Boot.__string_rec(this,''); },$hxEnums = $hxEnums || {},$_;
+function $extend(from, fields) {
+	var proto = Object.create(from);
+	for (var name in fields) proto[name] = fields[name];
+	if( fields.toString !== Object.prototype.toString ) proto.toString = fields.toString;
+	return proto;
+}
+var DateTools = function() { };
+DateTools.__name__ = true;
+DateTools.__format_get = function(d,e) {
+	switch(e) {
+	case "%":
+		return "%";
+	case "A":
+		return DateTools.DAY_NAMES[d.getDay()];
+	case "B":
+		return DateTools.MONTH_NAMES[d.getMonth()];
+	case "C":
+		return StringTools.lpad(Std.string(d.getFullYear() / 100 | 0),"0",2);
+	case "D":
+		return DateTools.__format(d,"%m/%d/%y");
+	case "F":
+		return DateTools.__format(d,"%Y-%m-%d");
+	case "I":case "l":
+		var hour = d.getHours() % 12;
+		return StringTools.lpad(Std.string(hour == 0 ? 12 : hour),e == "I" ? "0" : " ",2);
+	case "M":
+		return StringTools.lpad(Std.string(d.getMinutes()),"0",2);
+	case "R":
+		return DateTools.__format(d,"%H:%M");
+	case "S":
+		return StringTools.lpad(Std.string(d.getSeconds()),"0",2);
+	case "T":
+		return DateTools.__format(d,"%H:%M:%S");
+	case "Y":
+		return Std.string(d.getFullYear());
+	case "a":
+		return DateTools.DAY_SHORT_NAMES[d.getDay()];
+	case "b":case "h":
+		return DateTools.MONTH_SHORT_NAMES[d.getMonth()];
+	case "d":
+		return StringTools.lpad(Std.string(d.getDate()),"0",2);
+	case "e":
+		return Std.string(d.getDate());
+	case "H":case "k":
+		return StringTools.lpad(Std.string(d.getHours()),e == "H" ? "0" : " ",2);
+	case "m":
+		return StringTools.lpad(Std.string(d.getMonth() + 1),"0",2);
+	case "n":
+		return "\n";
+	case "p":
+		if(d.getHours() > 11) {
+			return "PM";
+		} else {
+			return "AM";
+		}
+		break;
+	case "r":
+		return DateTools.__format(d,"%I:%M:%S %p");
+	case "s":
+		return Std.string(d.getTime() / 1000 | 0);
+	case "t":
+		return "\t";
+	case "u":
+		var t = d.getDay();
+		if(t == 0) {
+			return "7";
+		} else if(t == null) {
+			return "null";
+		} else {
+			return "" + t;
+		}
+		break;
+	case "w":
+		return Std.string(d.getDay());
+	case "y":
+		return StringTools.lpad(Std.string(d.getFullYear() % 100),"0",2);
+	default:
+		throw new haxe_exceptions_NotImplementedException("Date.format %" + e + "- not implemented yet.",null,{ fileName : "DateTools.hx", lineNumber : 101, className : "DateTools", methodName : "__format_get"});
+	}
+};
+DateTools.__format = function(d,f) {
+	var r_b = "";
+	var p = 0;
+	while(true) {
+		var np = f.indexOf("%",p);
+		if(np < 0) {
+			break;
+		}
+		var len = np - p;
+		r_b += len == null ? HxOverrides.substr(f,p,null) : HxOverrides.substr(f,p,len);
+		r_b += Std.string(DateTools.__format_get(d,HxOverrides.substr(f,np + 1,1)));
+		p = np + 2;
+	}
+	var len = f.length - p;
+	r_b += len == null ? HxOverrides.substr(f,p,null) : HxOverrides.substr(f,p,len);
+	return r_b;
+};
+DateTools.format = function(d,f) {
+	return DateTools.__format(d,f);
+};
+var HxOverrides = function() { };
+HxOverrides.__name__ = true;
+HxOverrides.cca = function(s,index) {
+	var x = s.charCodeAt(index);
+	if(x != x) {
+		return undefined;
+	}
+	return x;
+};
+HxOverrides.substr = function(s,pos,len) {
+	if(len == null) {
+		len = s.length;
+	} else if(len < 0) {
+		if(pos == 0) {
+			len = s.length + len;
+		} else {
+			return "";
+		}
+	}
+	return s.substr(pos,len);
+};
+HxOverrides.now = function() {
+	return Date.now();
+};
+var Lambda = function() { };
+Lambda.__name__ = true;
+Lambda.array = function(it) {
+	var a = [];
+	var i = $getIterator(it);
+	while(i.hasNext()) {
+		var i1 = i.next();
+		a.push(i1);
+	}
+	return a;
+};
+Math.__name__ = true;
+var PmaxGThumb = $hx_exports["PmaxGThumb"] = function() { };
+PmaxGThumb.__name__ = true;
+PmaxGThumb.main = function() {
+};
+PmaxGThumb.place = function(oldOptions) {
+	if(oldOptions == null || oldOptions.key == null) {
+		throw haxe_Exception.thrown("Option 'key' was not set");
+	}
+	var newOptions = { };
+	var key = Std.string(oldOptions.key);
+	newOptions.instance = key;
+	if(key.length > 6) {
+		newOptions.instance = HxOverrides.substr(key,0,key.length - 6);
+	}
+	newOptions.map = false;
+	newOptions.instanceName = false;
+	newOptions.weather = false;
+	newOptions.instanceLogo = false;
+	newOptions.timelapse = false;
+	if(oldOptions.id != null) {
+		newOptions.id = oldOptions.id;
+		var element = window.document.getElementById(oldOptions.id);
+		if(element != null) {
+			newOptions.id = oldOptions.id;
+		} else {
+			haxe_Log.trace("No element with ID '" + Std.string(oldOptions.id) + "' could be found. Ignoring 'id' parameter. Please update your PmaxGThumb configuration. For more information visit https://www.panomax.com",{ fileName : "src/PmaxGThumb.hx", lineNumber : 41, className : "PmaxGThumb", methodName : "place"});
+		}
+	}
+	if(oldOptions.resolution != null) {
+		newOptions.resolution = oldOptions.resolution;
+	}
+	if(oldOptions.width != null) {
+		newOptions.width = oldOptions.width;
+	}
+	if(oldOptions.height != null) {
+		newOptions.height = oldOptions.height;
+	}
+	if(oldOptions.timestamp != null) {
+		newOptions.timestamp = oldOptions.timestamp;
+	}
+	if(oldOptions.target != null) {
+		newOptions.target = oldOptions.target;
+	}
+	if(oldOptions.continuous != null) {
+		newOptions.continuous = oldOptions.continuous;
+	}
+	if(oldOptions.noLink != null) {
+		newOptions.noLink = oldOptions.noLink;
+	}
+	PmaxThumbnail.place(newOptions);
+};
+PmaxGThumb.open = function(key) {
+	haxe_Log.trace("The function 'open' is deprecated. Please update your PmaxGThumb configuration. For more information visit https://www.panomax.com",{ fileName : "src/PmaxGThumb.hx", lineNumber : 73, className : "PmaxGThumb", methodName : "open"});
+};
+var PmaxThumbnail = $hx_exports["PmaxThumbnail"] = function() { };
+PmaxThumbnail.__name__ = true;
+PmaxThumbnail.main = function() {
+	PmaxGThumb.main();
+};
+PmaxThumbnail.place = function(options) {
+	var pmax = pmax_PmaxHelper.getPmax();
+	pmax.manager.place(options);
+};
+var Reflect = function() { };
+Reflect.__name__ = true;
+Reflect.field = function(o,field) {
+	try {
+		return o[field];
+	} catch( _g ) {
+		return null;
+	}
+};
+Reflect.fields = function(o) {
+	var a = [];
+	if(o != null) {
+		var hasOwnProperty = Object.prototype.hasOwnProperty;
+		for( var f in o ) {
+		if(f != "__id__" && f != "hx__closures__" && hasOwnProperty.call(o,f)) {
+			a.push(f);
+		}
+		}
+	}
+	return a;
+};
+Reflect.isFunction = function(f) {
+	if(typeof(f) == "function") {
+		return !(f.__name__ || f.__ename__);
+	} else {
+		return false;
+	}
+};
+Reflect.compare = function(a,b) {
+	if(a == b) {
+		return 0;
+	} else if(a > b) {
+		return 1;
+	} else {
+		return -1;
+	}
+};
+Reflect.compareMethods = function(f1,f2) {
+	if(f1 == f2) {
+		return true;
+	}
+	if(!Reflect.isFunction(f1) || !Reflect.isFunction(f2)) {
+		return false;
+	}
+	if(f1.scope == f2.scope && f1.method == f2.method) {
+		return f1.method != null;
+	} else {
+		return false;
+	}
+};
+var Std = function() { };
+Std.__name__ = true;
+Std.string = function(s) {
+	return js_Boot.__string_rec(s,"");
+};
+Std.parseInt = function(x) {
+	if(x != null) {
+		var _g = 0;
+		var _g1 = x.length;
+		while(_g < _g1) {
+			var i = _g++;
+			var c = x.charCodeAt(i);
+			if(c <= 8 || c >= 14 && c != 32 && c != 45) {
+				var nc = x.charCodeAt(i + 1);
+				var v = parseInt(x,nc == 120 || nc == 88 ? 16 : 10);
+				if(isNaN(v)) {
+					return null;
+				} else {
+					return v;
+				}
+			}
+		}
+	}
+	return null;
+};
+var StringBuf = function() {
+	this.b = "";
+};
+StringBuf.__name__ = true;
+StringBuf.prototype = {
+	__class__: StringBuf
+};
+var StringTools = function() { };
+StringTools.__name__ = true;
+StringTools.isSpace = function(s,pos) {
+	var c = HxOverrides.cca(s,pos);
+	if(!(c > 8 && c < 14)) {
+		return c == 32;
+	} else {
+		return true;
+	}
+};
+StringTools.ltrim = function(s) {
+	var l = s.length;
+	var r = 0;
+	while(r < l && StringTools.isSpace(s,r)) ++r;
+	if(r > 0) {
+		return HxOverrides.substr(s,r,l - r);
+	} else {
+		return s;
+	}
+};
+StringTools.rtrim = function(s) {
+	var l = s.length;
+	var r = 0;
+	while(r < l && StringTools.isSpace(s,l - r - 1)) ++r;
+	if(r > 0) {
+		return HxOverrides.substr(s,0,l - r);
+	} else {
+		return s;
+	}
+};
+StringTools.trim = function(s) {
+	return StringTools.ltrim(StringTools.rtrim(s));
+};
+StringTools.lpad = function(s,c,l) {
+	if(c.length <= 0) {
+		return s;
+	}
+	var buf_b = "";
+	l -= s.length;
+	while(buf_b.length < l) buf_b += c == null ? "null" : "" + c;
+	buf_b += s == null ? "null" : "" + s;
+	return buf_b;
+};
+var ValueType = $hxEnums["ValueType"] = { __ename__:true,__constructs__:null
+	,TNull: {_hx_name:"TNull",_hx_index:0,__enum__:"ValueType",toString:$estr}
+	,TInt: {_hx_name:"TInt",_hx_index:1,__enum__:"ValueType",toString:$estr}
+	,TFloat: {_hx_name:"TFloat",_hx_index:2,__enum__:"ValueType",toString:$estr}
+	,TBool: {_hx_name:"TBool",_hx_index:3,__enum__:"ValueType",toString:$estr}
+	,TObject: {_hx_name:"TObject",_hx_index:4,__enum__:"ValueType",toString:$estr}
+	,TFunction: {_hx_name:"TFunction",_hx_index:5,__enum__:"ValueType",toString:$estr}
+	,TClass: ($_=function(c) { return {_hx_index:6,c:c,__enum__:"ValueType",toString:$estr}; },$_._hx_name="TClass",$_.__params__ = ["c"],$_)
+	,TEnum: ($_=function(e) { return {_hx_index:7,e:e,__enum__:"ValueType",toString:$estr}; },$_._hx_name="TEnum",$_.__params__ = ["e"],$_)
+	,TUnknown: {_hx_name:"TUnknown",_hx_index:8,__enum__:"ValueType",toString:$estr}
+};
+ValueType.__constructs__ = [ValueType.TNull,ValueType.TInt,ValueType.TFloat,ValueType.TBool,ValueType.TObject,ValueType.TFunction,ValueType.TClass,ValueType.TEnum,ValueType.TUnknown];
+var Type = function() { };
+Type.__name__ = true;
+Type.getEnum = function(o) {
+	if(o == null) {
+		return null;
+	}
+	return $hxEnums[o.__enum__];
+};
+Type.typeof = function(v) {
+	switch(typeof(v)) {
+	case "boolean":
+		return ValueType.TBool;
+	case "function":
+		if(v.__name__ || v.__ename__) {
+			return ValueType.TObject;
+		}
+		return ValueType.TFunction;
+	case "number":
+		if(Math.ceil(v) == v % 2147483648.0) {
+			return ValueType.TInt;
+		}
+		return ValueType.TFloat;
+	case "object":
+		if(v == null) {
+			return ValueType.TNull;
+		}
+		var e = v.__enum__;
+		if(e != null) {
+			return ValueType.TEnum($hxEnums[e]);
+		}
+		var c = js_Boot.getClass(v);
+		if(c != null) {
+			return ValueType.TClass(c);
+		}
+		return ValueType.TObject;
+	case "string":
+		return ValueType.TClass(String);
+	case "undefined":
+		return ValueType.TNull;
+	default:
+		return ValueType.TUnknown;
+	}
+};
+Type.enumParameters = function(e) {
+	var enm = $hxEnums[e.__enum__];
+	var params = enm.__constructs__[e._hx_index].__params__;
+	if(params != null) {
+		var _g = [];
+		var _g1 = 0;
+		while(_g1 < params.length) {
+			var p = params[_g1];
+			++_g1;
+			_g.push(e[p]);
+		}
+		return _g;
+	} else {
+		return [];
+	}
+};
+var haxe_StackItem = $hxEnums["haxe.StackItem"] = { __ename__:true,__constructs__:null
+	,CFunction: {_hx_name:"CFunction",_hx_index:0,__enum__:"haxe.StackItem",toString:$estr}
+	,Module: ($_=function(m) { return {_hx_index:1,m:m,__enum__:"haxe.StackItem",toString:$estr}; },$_._hx_name="Module",$_.__params__ = ["m"],$_)
+	,FilePos: ($_=function(s,file,line,column) { return {_hx_index:2,s:s,file:file,line:line,column:column,__enum__:"haxe.StackItem",toString:$estr}; },$_._hx_name="FilePos",$_.__params__ = ["s","file","line","column"],$_)
+	,Method: ($_=function(classname,method) { return {_hx_index:3,classname:classname,method:method,__enum__:"haxe.StackItem",toString:$estr}; },$_._hx_name="Method",$_.__params__ = ["classname","method"],$_)
+	,LocalFunction: ($_=function(v) { return {_hx_index:4,v:v,__enum__:"haxe.StackItem",toString:$estr}; },$_._hx_name="LocalFunction",$_.__params__ = ["v"],$_)
+};
+haxe_StackItem.__constructs__ = [haxe_StackItem.CFunction,haxe_StackItem.Module,haxe_StackItem.FilePos,haxe_StackItem.Method,haxe_StackItem.LocalFunction];
+var haxe_CallStack = {};
+haxe_CallStack.callStack = function() {
+	return haxe_NativeStackTrace.toHaxe(haxe_NativeStackTrace.callStack());
+};
+haxe_CallStack.toString = function(stack) {
+	var b = new StringBuf();
+	var _g = 0;
+	var _g1 = stack;
+	while(_g < _g1.length) {
+		var s = _g1[_g];
+		++_g;
+		b.b += "\nCalled from ";
+		haxe_CallStack.itemToString(b,s);
+	}
+	return b.b;
+};
+haxe_CallStack.itemToString = function(b,s) {
+	switch(s._hx_index) {
+	case 0:
+		b.b += "a C function";
+		break;
+	case 1:
+		var m = s.m;
+		b.b += "module ";
+		b.b += m == null ? "null" : "" + m;
+		break;
+	case 2:
+		var s1 = s.s;
+		var file = s.file;
+		var line = s.line;
+		var col = s.column;
+		if(s1 != null) {
+			haxe_CallStack.itemToString(b,s1);
+			b.b += " (";
+		}
+		b.b += file == null ? "null" : "" + file;
+		b.b += " line ";
+		b.b += line == null ? "null" : "" + line;
+		if(col != null) {
+			b.b += " column ";
+			b.b += col == null ? "null" : "" + col;
+		}
+		if(s1 != null) {
+			b.b += ")";
+		}
+		break;
+	case 3:
+		var cname = s.classname;
+		var meth = s.method;
+		b.b += Std.string(cname == null ? "<unknown>" : cname);
+		b.b += ".";
+		b.b += meth == null ? "null" : "" + meth;
+		break;
+	case 4:
+		var n = s.v;
+		b.b += "local function #";
+		b.b += n == null ? "null" : "" + n;
+		break;
+	}
+};
+var haxe_IMap = function() { };
+haxe_IMap.__name__ = true;
+haxe_IMap.__isInterface__ = true;
+var haxe_Exception = function(message,previous,native) {
+	Error.call(this,message);
+	this.message = message;
+	this.__previousException = previous;
+	this.__nativeException = native != null ? native : this;
+};
+haxe_Exception.__name__ = true;
+haxe_Exception.caught = function(value) {
+	if(((value) instanceof haxe_Exception)) {
+		return value;
+	} else if(((value) instanceof Error)) {
+		return new haxe_Exception(value.message,null,value);
+	} else {
+		return new haxe_ValueException(value,null,value);
+	}
+};
+haxe_Exception.thrown = function(value) {
+	if(((value) instanceof haxe_Exception)) {
+		return value.get_native();
+	} else if(((value) instanceof Error)) {
+		return value;
+	} else {
+		var e = new haxe_ValueException(value);
+		return e;
+	}
+};
+haxe_Exception.__super__ = Error;
+haxe_Exception.prototype = $extend(Error.prototype,{
+	unwrap: function() {
+		return this.__nativeException;
+	}
+	,toString: function() {
+		return this.get_message();
+	}
+	,get_message: function() {
+		return this.message;
+	}
+	,get_native: function() {
+		return this.__nativeException;
+	}
+	,__class__: haxe_Exception
+});
+var haxe_Log = function() { };
+haxe_Log.__name__ = true;
+haxe_Log.formatOutput = function(v,infos) {
+	var str = Std.string(v);
+	if(infos == null) {
+		return str;
+	}
+	var pstr = infos.fileName + ":" + infos.lineNumber;
+	if(infos.customParams != null) {
+		var _g = 0;
+		var _g1 = infos.customParams;
+		while(_g < _g1.length) {
+			var v = _g1[_g];
+			++_g;
+			str += ", " + Std.string(v);
+		}
+	}
+	return pstr + ": " + str;
+};
+haxe_Log.trace = function(v,infos) {
+	var str = haxe_Log.formatOutput(v,infos);
+	if(typeof(console) != "undefined" && console.log != null) {
+		console.log(str);
+	}
+};
+var haxe_NativeStackTrace = function() { };
+haxe_NativeStackTrace.__name__ = true;
+haxe_NativeStackTrace.callStack = function() {
+	var e = new Error("");
+	var stack = haxe_NativeStackTrace.tryHaxeStack(e);
+	if(typeof(stack) == "undefined") {
+		try {
+			throw e;
+		} catch( _g ) {
+		}
+		stack = e.stack;
+	}
+	return haxe_NativeStackTrace.normalize(stack,2);
+};
+haxe_NativeStackTrace.toHaxe = function(s,skip) {
+	if(skip == null) {
+		skip = 0;
+	}
+	if(s == null) {
+		return [];
+	} else if(typeof(s) == "string") {
+		var stack = s.split("\n");
+		if(stack[0] == "Error") {
+			stack.shift();
+		}
+		var m = [];
+		var _g = 0;
+		var _g1 = stack.length;
+		while(_g < _g1) {
+			var i = _g++;
+			if(skip > i) {
+				continue;
+			}
+			var line = stack[i];
+			var matched = line.match(/^    at ([A-Za-z0-9_. ]+) \(([^)]+):([0-9]+):([0-9]+)\)$/);
+			if(matched != null) {
+				var path = matched[1].split(".");
+				if(path[0] == "$hxClasses") {
+					path.shift();
+				}
+				var meth = path.pop();
+				var file = matched[2];
+				var line1 = Std.parseInt(matched[3]);
+				var column = Std.parseInt(matched[4]);
+				m.push(haxe_StackItem.FilePos(meth == "Anonymous function" ? haxe_StackItem.LocalFunction() : meth == "Global code" ? null : haxe_StackItem.Method(path.join("."),meth),file,line1,column));
+			} else {
+				m.push(haxe_StackItem.Module(StringTools.trim(line)));
+			}
+		}
+		return m;
+	} else if(skip > 0 && Array.isArray(s)) {
+		return s.slice(skip);
+	} else {
+		return s;
+	}
+};
+haxe_NativeStackTrace.tryHaxeStack = function(e) {
+	if(e == null) {
+		return [];
+	}
+	var oldValue = Error.prepareStackTrace;
+	Error.prepareStackTrace = haxe_NativeStackTrace.prepareHxStackTrace;
+	var stack = e.stack;
+	Error.prepareStackTrace = oldValue;
+	return stack;
+};
+haxe_NativeStackTrace.prepareHxStackTrace = function(e,callsites) {
+	var stack = [];
+	var _g = 0;
+	while(_g < callsites.length) {
+		var site = callsites[_g];
+		++_g;
+		if(haxe_NativeStackTrace.wrapCallSite != null) {
+			site = haxe_NativeStackTrace.wrapCallSite(site);
+		}
+		var method = null;
+		var fullName = site.getFunctionName();
+		if(fullName != null) {
+			var idx = fullName.lastIndexOf(".");
+			if(idx >= 0) {
+				var className = fullName.substring(0,idx);
+				var methodName = fullName.substring(idx + 1);
+				method = haxe_StackItem.Method(className,methodName);
+			} else {
+				method = haxe_StackItem.Method(null,fullName);
+			}
+		}
+		var fileName = site.getFileName();
+		var fileAddr = fileName == null ? -1 : fileName.indexOf("file:");
+		if(haxe_NativeStackTrace.wrapCallSite != null && fileAddr > 0) {
+			fileName = fileName.substring(fileAddr + 6);
+		}
+		stack.push(haxe_StackItem.FilePos(method,fileName,site.getLineNumber(),site.getColumnNumber()));
+	}
+	return stack;
+};
+haxe_NativeStackTrace.normalize = function(stack,skipItems) {
+	if(skipItems == null) {
+		skipItems = 0;
+	}
+	if(Array.isArray(stack) && skipItems > 0) {
+		return stack.slice(skipItems);
+	} else if(typeof(stack) == "string") {
+		switch(stack.substring(0,6)) {
+		case "Error\n":case "Error:":
+			++skipItems;
+			break;
+		default:
+		}
+		return haxe_NativeStackTrace.skipLines(stack,skipItems);
+	} else {
+		return stack;
+	}
+};
+haxe_NativeStackTrace.skipLines = function(stack,skip,pos) {
+	if(pos == null) {
+		pos = 0;
+	}
+	if(skip > 0) {
+		pos = stack.indexOf("\n",pos);
+		if(pos < 0) {
+			return "";
+		} else {
+			return haxe_NativeStackTrace.skipLines(stack,--skip,pos + 1);
+		}
+	} else {
+		return stack.substring(pos);
+	}
+};
+var haxe_Timer = function(time_ms) {
+	var me = this;
+	this.id = setInterval(function() {
+		me.run();
+	},time_ms);
+};
+haxe_Timer.__name__ = true;
+haxe_Timer.delay = function(f,time_ms) {
+	var t = new haxe_Timer(time_ms);
+	t.run = function() {
+		t.stop();
+		f();
+	};
+	return t;
+};
+haxe_Timer.prototype = {
+	stop: function() {
+		if(this.id == null) {
+			return;
+		}
+		clearInterval(this.id);
+		this.id = null;
+	}
+	,run: function() {
+	}
+	,__class__: haxe_Timer
+};
+var haxe_ValueException = function(value,previous,native) {
+	haxe_Exception.call(this,String(value),previous,native);
+	this.value = value;
+};
+haxe_ValueException.__name__ = true;
+haxe_ValueException.__super__ = haxe_Exception;
+haxe_ValueException.prototype = $extend(haxe_Exception.prototype,{
+	unwrap: function() {
+		return this.value;
+	}
+	,__class__: haxe_ValueException
+});
+var haxe_ds_IntMap = function() {
+	this.h = { };
+};
+haxe_ds_IntMap.__name__ = true;
+haxe_ds_IntMap.__interfaces__ = [haxe_IMap];
+haxe_ds_IntMap.prototype = {
+	remove: function(key) {
+		if(!this.h.hasOwnProperty(key)) {
+			return false;
+		}
+		delete(this.h[key]);
+		return true;
+	}
+	,keys: function() {
+		var a = [];
+		for( var key in this.h ) if(this.h.hasOwnProperty(key)) a.push(+key);
+		return new haxe_iterators_ArrayIterator(a);
+	}
+	,iterator: function() {
+		return { ref : this.h, it : this.keys(), hasNext : function() {
+			return this.it.hasNext();
+		}, next : function() {
+			var i = this.it.next();
+			return this.ref[i];
+		}};
+	}
+	,__class__: haxe_ds_IntMap
+};
+var haxe_ds_StringMap = function() {
+	this.h = Object.create(null);
+};
+haxe_ds_StringMap.__name__ = true;
+haxe_ds_StringMap.__interfaces__ = [haxe_IMap];
+haxe_ds_StringMap.prototype = {
+	iterator: function() {
+		return new haxe_ds__$StringMap_StringMapValueIterator(this.h);
+	}
+	,__class__: haxe_ds_StringMap
+};
+var haxe_ds__$StringMap_StringMapValueIterator = function(h) {
+	this.h = h;
+	this.keys = Object.keys(h);
+	this.length = this.keys.length;
+	this.current = 0;
+};
+haxe_ds__$StringMap_StringMapValueIterator.__name__ = true;
+haxe_ds__$StringMap_StringMapValueIterator.prototype = {
+	hasNext: function() {
+		return this.current < this.length;
+	}
+	,next: function() {
+		return this.h[this.keys[this.current++]];
+	}
+	,__class__: haxe_ds__$StringMap_StringMapValueIterator
+};
+var haxe_exceptions_PosException = function(message,previous,pos) {
+	haxe_Exception.call(this,message,previous);
+	if(pos == null) {
+		this.posInfos = { fileName : "(unknown)", lineNumber : 0, className : "(unknown)", methodName : "(unknown)"};
+	} else {
+		this.posInfos = pos;
+	}
+};
+haxe_exceptions_PosException.__name__ = true;
+haxe_exceptions_PosException.__super__ = haxe_Exception;
+haxe_exceptions_PosException.prototype = $extend(haxe_Exception.prototype,{
+	toString: function() {
+		return "" + haxe_Exception.prototype.toString.call(this) + " in " + this.posInfos.className + "." + this.posInfos.methodName + " at " + this.posInfos.fileName + ":" + this.posInfos.lineNumber;
+	}
+	,__class__: haxe_exceptions_PosException
+});
+var haxe_exceptions_NotImplementedException = function(message,previous,pos) {
+	if(message == null) {
+		message = "Not implemented";
+	}
+	haxe_exceptions_PosException.call(this,message,previous,pos);
+};
+haxe_exceptions_NotImplementedException.__name__ = true;
+haxe_exceptions_NotImplementedException.__super__ = haxe_exceptions_PosException;
+haxe_exceptions_NotImplementedException.prototype = $extend(haxe_exceptions_PosException.prototype,{
+	__class__: haxe_exceptions_NotImplementedException
+});
+var haxe_iterators_ArrayIterator = function(array) {
+	this.current = 0;
+	this.array = array;
+};
+haxe_iterators_ArrayIterator.__name__ = true;
+haxe_iterators_ArrayIterator.prototype = {
+	hasNext: function() {
+		return this.current < this.array.length;
+	}
+	,next: function() {
+		return this.array[this.current++];
+	}
+	,__class__: haxe_iterators_ArrayIterator
+};
+var js_Boot = function() { };
+js_Boot.__name__ = true;
+js_Boot.getClass = function(o) {
+	if(o == null) {
+		return null;
+	} else if(((o) instanceof Array)) {
+		return Array;
+	} else {
+		var cl = o.__class__;
+		if(cl != null) {
+			return cl;
+		}
+		var name = js_Boot.__nativeClassName(o);
+		if(name != null) {
+			return js_Boot.__resolveNativeClass(name);
+		}
+		return null;
+	}
+};
+js_Boot.__string_rec = function(o,s) {
+	if(o == null) {
+		return "null";
+	}
+	if(s.length >= 5) {
+		return "<...>";
+	}
+	var t = typeof(o);
+	if(t == "function" && (o.__name__ || o.__ename__)) {
+		t = "object";
+	}
+	switch(t) {
+	case "function":
+		return "<function>";
+	case "object":
+		if(o.__enum__) {
+			var e = $hxEnums[o.__enum__];
+			var con = e.__constructs__[o._hx_index];
+			var n = con._hx_name;
+			if(con.__params__) {
+				s = s + "\t";
+				return n + "(" + ((function($this) {
+					var $r;
+					var _g = [];
+					{
+						var _g1 = 0;
+						var _g2 = con.__params__;
+						while(true) {
+							if(!(_g1 < _g2.length)) {
+								break;
+							}
+							var p = _g2[_g1];
+							_g1 = _g1 + 1;
+							_g.push(js_Boot.__string_rec(o[p],s));
+						}
+					}
+					$r = _g;
+					return $r;
+				}(this))).join(",") + ")";
+			} else {
+				return n;
+			}
+		}
+		if(((o) instanceof Array)) {
+			var str = "[";
+			s += "\t";
+			var _g = 0;
+			var _g1 = o.length;
+			while(_g < _g1) {
+				var i = _g++;
+				str += (i > 0 ? "," : "") + js_Boot.__string_rec(o[i],s);
+			}
+			str += "]";
+			return str;
+		}
+		var tostr;
+		try {
+			tostr = o.toString;
+		} catch( _g ) {
+			return "???";
+		}
+		if(tostr != null && tostr != Object.toString && typeof(tostr) == "function") {
+			var s2 = o.toString();
+			if(s2 != "[object Object]") {
+				return s2;
+			}
+		}
+		var str = "{\n";
+		s += "\t";
+		var hasp = o.hasOwnProperty != null;
+		var k = null;
+		for( k in o ) {
+		if(hasp && !o.hasOwnProperty(k)) {
+			continue;
+		}
+		if(k == "prototype" || k == "__class__" || k == "__super__" || k == "__interfaces__" || k == "__properties__") {
+			continue;
+		}
+		if(str.length != 2) {
+			str += ", \n";
+		}
+		str += s + k + " : " + js_Boot.__string_rec(o[k],s);
+		}
+		s = s.substring(1);
+		str += "\n" + s + "}";
+		return str;
+	case "string":
+		return o;
+	default:
+		return String(o);
+	}
+};
+js_Boot.__interfLoop = function(cc,cl) {
+	if(cc == null) {
+		return false;
+	}
+	if(cc == cl) {
+		return true;
+	}
+	var intf = cc.__interfaces__;
+	if(intf != null) {
+		var _g = 0;
+		var _g1 = intf.length;
+		while(_g < _g1) {
+			var i = _g++;
+			var i1 = intf[i];
+			if(i1 == cl || js_Boot.__interfLoop(i1,cl)) {
+				return true;
+			}
+		}
+	}
+	return js_Boot.__interfLoop(cc.__super__,cl);
+};
+js_Boot.__instanceof = function(o,cl) {
+	if(cl == null) {
+		return false;
+	}
+	switch(cl) {
+	case Array:
+		return ((o) instanceof Array);
+	case Bool:
+		return typeof(o) == "boolean";
+	case Dynamic:
+		return o != null;
+	case Float:
+		return typeof(o) == "number";
+	case Int:
+		if(typeof(o) == "number") {
+			return ((o | 0) === o);
+		} else {
+			return false;
+		}
+		break;
+	case String:
+		return typeof(o) == "string";
+	default:
+		if(o != null) {
+			if(typeof(cl) == "function") {
+				if(js_Boot.__downcastCheck(o,cl)) {
+					return true;
+				}
+			} else if(typeof(cl) == "object" && js_Boot.__isNativeObj(cl)) {
+				if(((o) instanceof cl)) {
+					return true;
+				}
+			}
+		} else {
+			return false;
+		}
+		if(cl == Class ? o.__name__ != null : false) {
+			return true;
+		}
+		if(cl == Enum ? o.__ename__ != null : false) {
+			return true;
+		}
+		return o.__enum__ != null ? $hxEnums[o.__enum__] == cl : false;
+	}
+};
+js_Boot.__downcastCheck = function(o,cl) {
+	if(!((o) instanceof cl)) {
+		if(cl.__isInterface__) {
+			return js_Boot.__interfLoop(js_Boot.getClass(o),cl);
+		} else {
+			return false;
+		}
+	} else {
+		return true;
+	}
+};
+js_Boot.__implements = function(o,iface) {
+	return js_Boot.__interfLoop(js_Boot.getClass(o),iface);
+};
+js_Boot.__cast = function(o,t) {
+	if(o == null || js_Boot.__instanceof(o,t)) {
+		return o;
+	} else {
+		throw haxe_Exception.thrown("Cannot cast " + Std.string(o) + " to " + Std.string(t));
+	}
+};
+js_Boot.__nativeClassName = function(o) {
+	var name = js_Boot.__toStr.call(o).slice(8,-1);
+	if(name == "Object" || name == "Function" || name == "Math" || name == "JSON") {
+		return null;
+	}
+	return name;
+};
+js_Boot.__isNativeObj = function(o) {
+	return js_Boot.__nativeClassName(o) != null;
+};
+js_Boot.__resolveNativeClass = function(name) {
+	return $global[name];
+};
+var msignal_Signal = function(valueClasses) {
+	if(valueClasses == null) {
+		valueClasses = [];
+	}
+	this.valueClasses = valueClasses;
+	this.slots = msignal_SlotList.NIL;
+	this.priorityBased = false;
+};
+msignal_Signal.__name__ = true;
+msignal_Signal.prototype = {
+	add: function(listener) {
+		return this.registerListener(listener);
+	}
+	,addOnce: function(listener) {
+		return this.registerListener(listener,true);
+	}
+	,addWithPriority: function(listener,priority) {
+		if(priority == null) {
+			priority = 0;
+		}
+		return this.registerListener(listener,false,priority);
+	}
+	,addOnceWithPriority: function(listener,priority) {
+		if(priority == null) {
+			priority = 0;
+		}
+		return this.registerListener(listener,true,priority);
+	}
+	,remove: function(listener) {
+		var slot = this.slots.find(listener);
+		if(slot == null) {
+			return null;
+		}
+		this.slots = this.slots.filterNot(listener);
+		return slot;
+	}
+	,removeAll: function() {
+		this.slots = msignal_SlotList.NIL;
+	}
+	,registerListener: function(listener,once,priority) {
+		if(priority == null) {
+			priority = 0;
+		}
+		if(once == null) {
+			once = false;
+		}
+		if(this.registrationPossible(listener,once)) {
+			var newSlot = this.createSlot(listener,once,priority);
+			if(!this.priorityBased && priority != 0) {
+				this.priorityBased = true;
+			}
+			if(!this.priorityBased && priority == 0) {
+				this.slots = this.slots.prepend(newSlot);
+			} else {
+				this.slots = this.slots.insertWithPriority(newSlot);
+			}
+			return newSlot;
+		}
+		return this.slots.find(listener);
+	}
+	,registrationPossible: function(listener,once) {
+		if(!this.slots.nonEmpty) {
+			return true;
+		}
+		var existingSlot = this.slots.find(listener);
+		if(existingSlot == null) {
+			return true;
+		}
+		if(existingSlot.once != once) {
+			throw haxe_Exception.thrown("You cannot addOnce() then add() the same listener without removing the relationship first.");
+		}
+		return false;
+	}
+	,createSlot: function(listener,once,priority) {
+		if(priority == null) {
+			priority = 0;
+		}
+		if(once == null) {
+			once = false;
+		}
+		return null;
+	}
+	,get_numListeners: function() {
+		return this.slots.get_length();
+	}
+	,__class__: msignal_Signal
+};
+var msignal_EventSignal = function(target) {
+	msignal_Signal.call(this,[msignal_Event]);
+	this.target = target;
+};
+msignal_EventSignal.__name__ = true;
+msignal_EventSignal.__super__ = msignal_Signal;
+msignal_EventSignal.prototype = $extend(msignal_Signal.prototype,{
+	dispatch: function(event) {
+		if(event.target == null) {
+			event.target = this.target;
+			event.signal = this;
+		}
+		event.currentTarget = this.target;
+		var slotsToProcess = this.slots;
+		while(slotsToProcess.nonEmpty) {
+			slotsToProcess.head.execute(event);
+			slotsToProcess = slotsToProcess.tail;
+		}
+	}
+	,dispatchType: function(type) {
+		this.dispatch(new msignal_Event(type));
+	}
+	,bubble: function(event) {
+		this.dispatch(event);
+		var currentTarget = this.target;
+		while(currentTarget != null && Object.prototype.hasOwnProperty.call(currentTarget,"parent")) {
+			currentTarget = Reflect.field(currentTarget,"parent");
+			if(js_Boot.__implements(currentTarget,msignal_EventDispatcher)) {
+				event.currentTarget = currentTarget;
+				var dispatcher = js_Boot.__cast(currentTarget , msignal_EventDispatcher);
+				if(!dispatcher.dispatchEvent(event)) {
+					break;
+				}
+			}
+		}
+	}
+	,bubbleType: function(type) {
+		this.bubble(new msignal_Event(type));
+	}
+	,createSlot: function(listener,once,priority) {
+		if(priority == null) {
+			priority = 0;
+		}
+		if(once == null) {
+			once = false;
+		}
+		return new msignal_EventSlot(this,listener,once,priority);
+	}
+	,__class__: msignal_EventSignal
+});
+var msignal_Slot = function(signal,listener,once,priority) {
+	if(priority == null) {
+		priority = 0;
+	}
+	if(once == null) {
+		once = false;
+	}
+	this.signal = signal;
+	this.set_listener(listener);
+	this.once = once;
+	this.priority = priority;
+	this.enabled = true;
+};
+msignal_Slot.__name__ = true;
+msignal_Slot.prototype = {
+	remove: function() {
+		this.signal.remove(this.listener);
+	}
+	,set_listener: function(value) {
+		if(value == null) {
+			throw haxe_Exception.thrown("listener cannot be null");
+		}
+		return this.listener = value;
+	}
+	,__class__: msignal_Slot
+};
+var msignal_EventSlot = function(signal,listener,once,priority) {
+	if(priority == null) {
+		priority = 0;
+	}
+	if(once == null) {
+		once = false;
+	}
+	msignal_Slot.call(this,signal,listener,once,priority);
+};
+msignal_EventSlot.__name__ = true;
+msignal_EventSlot.typeEq = function(a,b) {
+	if(a == b) {
+		return true;
+	}
+	var _g = Type.typeof(a);
+	if(_g._hx_index == 7) {
+		var _g1 = _g.e;
+		return msignal_EventSlot.enumTypeEq(a,b);
+	} else {
+		return false;
+	}
+};
+msignal_EventSlot.enumTypeEq = function(a,b) {
+	if(a == b) {
+		return true;
+	}
+	if(Type.getEnum(a) != Type.getEnum(b)) {
+		return false;
+	}
+	if(a._hx_index != b._hx_index) {
+		return false;
+	}
+	var aParams = Type.enumParameters(a);
+	if(aParams.length == 0) {
+		return true;
+	}
+	var bParams = Type.enumParameters(b);
+	var _g = 0;
+	var _g1 = aParams.length;
+	while(_g < _g1) {
+		var i = _g++;
+		var aParam = aParams[i];
+		var bParam = bParams[i];
+		if(aParam == null) {
+			continue;
+		}
+		if(!msignal_EventSlot.typeEq(aParam,bParam)) {
+			return false;
+		}
+	}
+	return true;
+};
+msignal_EventSlot.__super__ = msignal_Slot;
+msignal_EventSlot.prototype = $extend(msignal_Slot.prototype,{
+	execute: function(value1) {
+		if(!this.enabled) {
+			return;
+		}
+		if(this.filterType != null && !msignal_EventSlot.typeEq(this.filterType,value1.type)) {
+			return;
+		}
+		if(this.once) {
+			this.remove();
+		}
+		this.listener(value1);
+	}
+	,forType: function(value) {
+		this.filterType = value;
+	}
+	,__class__: msignal_EventSlot
+});
+var msignal_Event = function(type) {
+	this.type = type;
+};
+msignal_Event.__name__ = true;
+msignal_Event.prototype = {
+	__class__: msignal_Event
+};
+var msignal_EventDispatcher = function() { };
+msignal_EventDispatcher.__name__ = true;
+msignal_EventDispatcher.__isInterface__ = true;
+msignal_EventDispatcher.prototype = {
+	__class__: msignal_EventDispatcher
+};
+var msignal_Signal0 = function() {
+	msignal_Signal.call(this);
+};
+msignal_Signal0.__name__ = true;
+msignal_Signal0.__super__ = msignal_Signal;
+msignal_Signal0.prototype = $extend(msignal_Signal.prototype,{
+	dispatch: function() {
+		var slotsToProcess = this.slots;
+		while(slotsToProcess.nonEmpty) {
+			slotsToProcess.head.execute();
+			slotsToProcess = slotsToProcess.tail;
+		}
+	}
+	,createSlot: function(listener,once,priority) {
+		if(priority == null) {
+			priority = 0;
+		}
+		if(once == null) {
+			once = false;
+		}
+		return new msignal_Slot0(this,listener,once,priority);
+	}
+	,__class__: msignal_Signal0
+});
+var msignal_Signal1 = function(type) {
+	msignal_Signal.call(this,[type]);
+};
+msignal_Signal1.__name__ = true;
+msignal_Signal1.__super__ = msignal_Signal;
+msignal_Signal1.prototype = $extend(msignal_Signal.prototype,{
+	dispatch: function(value) {
+		var slotsToProcess = this.slots;
+		while(slotsToProcess.nonEmpty) {
+			slotsToProcess.head.execute(value);
+			slotsToProcess = slotsToProcess.tail;
+		}
+	}
+	,createSlot: function(listener,once,priority) {
+		if(priority == null) {
+			priority = 0;
+		}
+		if(once == null) {
+			once = false;
+		}
+		return new msignal_Slot1(this,listener,once,priority);
+	}
+	,__class__: msignal_Signal1
+});
+var msignal_Signal2 = function(type1,type2) {
+	msignal_Signal.call(this,[type1,type2]);
+};
+msignal_Signal2.__name__ = true;
+msignal_Signal2.__super__ = msignal_Signal;
+msignal_Signal2.prototype = $extend(msignal_Signal.prototype,{
+	dispatch: function(value1,value2) {
+		var slotsToProcess = this.slots;
+		while(slotsToProcess.nonEmpty) {
+			slotsToProcess.head.execute(value1,value2);
+			slotsToProcess = slotsToProcess.tail;
+		}
+	}
+	,createSlot: function(listener,once,priority) {
+		if(priority == null) {
+			priority = 0;
+		}
+		if(once == null) {
+			once = false;
+		}
+		return new msignal_Slot2(this,listener,once,priority);
+	}
+	,__class__: msignal_Signal2
+});
+var msignal_Slot0 = function(signal,listener,once,priority) {
+	if(priority == null) {
+		priority = 0;
+	}
+	if(once == null) {
+		once = false;
+	}
+	msignal_Slot.call(this,signal,listener,once,priority);
+};
+msignal_Slot0.__name__ = true;
+msignal_Slot0.__super__ = msignal_Slot;
+msignal_Slot0.prototype = $extend(msignal_Slot.prototype,{
+	execute: function() {
+		if(!this.enabled) {
+			return;
+		}
+		if(this.once) {
+			this.remove();
+		}
+		this.listener();
+	}
+	,__class__: msignal_Slot0
+});
+var msignal_Slot1 = function(signal,listener,once,priority) {
+	if(priority == null) {
+		priority = 0;
+	}
+	if(once == null) {
+		once = false;
+	}
+	msignal_Slot.call(this,signal,listener,once,priority);
+};
+msignal_Slot1.__name__ = true;
+msignal_Slot1.__super__ = msignal_Slot;
+msignal_Slot1.prototype = $extend(msignal_Slot.prototype,{
+	execute: function(value1) {
+		if(!this.enabled) {
+			return;
+		}
+		if(this.once) {
+			this.remove();
+		}
+		if(this.param != null) {
+			value1 = this.param;
+		}
+		this.listener(value1);
+	}
+	,__class__: msignal_Slot1
+});
+var msignal_Slot2 = function(signal,listener,once,priority) {
+	if(priority == null) {
+		priority = 0;
+	}
+	if(once == null) {
+		once = false;
+	}
+	msignal_Slot.call(this,signal,listener,once,priority);
+};
+msignal_Slot2.__name__ = true;
+msignal_Slot2.__super__ = msignal_Slot;
+msignal_Slot2.prototype = $extend(msignal_Slot.prototype,{
+	execute: function(value1,value2) {
+		if(!this.enabled) {
+			return;
+		}
+		if(this.once) {
+			this.remove();
+		}
+		if(this.param1 != null) {
+			value1 = this.param1;
+		}
+		if(this.param2 != null) {
+			value2 = this.param2;
+		}
+		this.listener(value1,value2);
+	}
+	,__class__: msignal_Slot2
+});
+var msignal_SlotList = function(head,tail) {
+	this.nonEmpty = false;
+	if(head == null && tail == null) {
+		if(msignal_SlotList.NIL != null) {
+			throw haxe_Exception.thrown("Parameters head and tail are null. Use the NIL element instead.");
+		}
+		this.nonEmpty = false;
+	} else if(head == null) {
+		throw haxe_Exception.thrown("Parameter head cannot be null.");
+	} else {
+		this.head = head;
+		this.tail = tail == null ? msignal_SlotList.NIL : tail;
+		this.nonEmpty = true;
+	}
+};
+msignal_SlotList.__name__ = true;
+msignal_SlotList.prototype = {
+	get_length: function() {
+		if(!this.nonEmpty) {
+			return 0;
+		}
+		if(this.tail == msignal_SlotList.NIL) {
+			return 1;
+		}
+		var result = 0;
+		var p = this;
+		while(p.nonEmpty) {
+			++result;
+			p = p.tail;
+		}
+		return result;
+	}
+	,prepend: function(slot) {
+		return new msignal_SlotList(slot,this);
+	}
+	,append: function(slot) {
+		if(slot == null) {
+			return this;
+		}
+		if(!this.nonEmpty) {
+			return new msignal_SlotList(slot);
+		}
+		if(this.tail == msignal_SlotList.NIL) {
+			return new msignal_SlotList(slot).prepend(this.head);
+		}
+		var wholeClone = new msignal_SlotList(this.head);
+		var subClone = wholeClone;
+		var current = this.tail;
+		while(current.nonEmpty) {
+			subClone = subClone.tail = new msignal_SlotList(current.head);
+			current = current.tail;
+		}
+		subClone.tail = new msignal_SlotList(slot);
+		return wholeClone;
+	}
+	,insertWithPriority: function(slot) {
+		if(!this.nonEmpty) {
+			return new msignal_SlotList(slot);
+		}
+		var priority = slot.priority;
+		if(priority >= this.head.priority) {
+			return this.prepend(slot);
+		}
+		var wholeClone = new msignal_SlotList(this.head);
+		var subClone = wholeClone;
+		var current = this.tail;
+		while(current.nonEmpty) {
+			if(priority > current.head.priority) {
+				subClone.tail = current.prepend(slot);
+				return wholeClone;
+			}
+			subClone = subClone.tail = new msignal_SlotList(current.head);
+			current = current.tail;
+		}
+		subClone.tail = new msignal_SlotList(slot);
+		return wholeClone;
+	}
+	,filterNot: function(listener) {
+		if(!this.nonEmpty || listener == null) {
+			return this;
+		}
+		if(Reflect.compareMethods(this.head.listener,listener)) {
+			return this.tail;
+		}
+		var wholeClone = new msignal_SlotList(this.head);
+		var subClone = wholeClone;
+		var current = this.tail;
+		while(current.nonEmpty) {
+			if(Reflect.compareMethods(current.head.listener,listener)) {
+				subClone.tail = current.tail;
+				return wholeClone;
+			}
+			subClone = subClone.tail = new msignal_SlotList(current.head);
+			current = current.tail;
+		}
+		return this;
+	}
+	,contains: function(listener) {
+		if(!this.nonEmpty) {
+			return false;
+		}
+		var p = this;
+		while(p.nonEmpty) {
+			if(Reflect.compareMethods(p.head.listener,listener)) {
+				return true;
+			}
+			p = p.tail;
+		}
+		return false;
+	}
+	,find: function(listener) {
+		if(!this.nonEmpty) {
+			return null;
+		}
+		var p = this;
+		while(p.nonEmpty) {
+			if(Reflect.compareMethods(p.head.listener,listener)) {
+				return p.head;
+			}
+			p = p.tail;
+		}
+		return null;
+	}
+	,__class__: msignal_SlotList
+};
+var pmax_Pmax = function() {
+	this.manager = new pmax_thumbnail_ThumbnailManager();
+};
+pmax_Pmax.__name__ = true;
+pmax_Pmax.stack = function() {
+	var stack = haxe_CallStack.callStack();
+	stack.shift();
+	haxe_Log.trace(haxe_CallStack.toString(stack),{ fileName : "src/pmax/Pmax.hx", lineNumber : 32, className : "pmax.Pmax", methodName : "stack"});
+};
+pmax_Pmax.prototype = {
+	__class__: pmax_Pmax
+};
+var pmax_PmaxHelper = function() { };
+pmax_PmaxHelper.__name__ = true;
+pmax_PmaxHelper.getPmax = function() {
+	var pmax = Reflect.field(window,pmax_PmaxHelper._pmaxWindowKey);
+	if(pmax == null) {
+		pmax = new pmax_Pmax();
+	}
+	pmax_PmaxHelper.pmax = pmax;
+	window[pmax_PmaxHelper._pmaxWindowKey] = pmax_PmaxHelper.pmax;
+	return pmax_PmaxHelper.pmax;
+};
+var pmax_config_ThumbnailConfig = function(index,options) {
+	this.noLink = false;
+	this.timelapse = true;
+	this.weather = true;
+	this.map = true;
+	this.instanceLogo = true;
+	this.instanceName = true;
+	this.continuous = true;
+	this.showTimestamp = false;
+	this.recent = true;
+	this.width = "100%";
+	this.resolution = "small";
+	this.target = "_blank";
+	this.mode = "default";
+	this.failoverThumbnailImageBaseUrl = pmax_Pmax.failoverThumbnailImageBaseUrl;
+	this.apiUrl = pmax_Pmax.apiUrl;
+	this.index = index;
+	if(options == null || options.instance == null) {
+		throw haxe_Exception.thrown("Option 'instance' was not set");
+	}
+	this.instance = options.instance;
+	if(options.env != null) {
+		this.apiUrl = "https://" + Std.string(options.env) + "/1.0";
+	}
+	if(options.id != null) {
+		this.id = Std.string(options.id);
+	}
+	if(options.target != null) {
+		this.target = Std.string(options.target);
+	}
+	if(options.resolution != null) {
+		this.resolution = Std.string(options.resolution);
+		this.heightInt = pmax_etc_Resolution.getHeight(this.resolution);
+		this.height = this.heightInt + "px";
+	}
+	if(options.height != null) {
+		this.heightInt = Std.parseInt(Std.string(options.height));
+		if(this.heightInt < 75) {
+			this.heightInt = 75;
+		}
+		this.height = this.heightInt + "px";
+		this.resolution = pmax_etc_Resolution.getBestResolution(this.heightInt);
+	}
+	if(options.resolution == null && options.height == null) {
+		this.resolution = pmax_etc_Resolution.getBestResolution(150);
+		this.heightInt = pmax_etc_Resolution.getHeight(this.resolution);
+		this.height = this.heightInt + "px";
+	}
+	if(this.height == null) {
+		var height = 150;
+		this.height = height + "px";
+		this.resolution = pmax_etc_Resolution.getBestResolution(height);
+	}
+	if(options.width != null) {
+		var f = options.width;
+		if(isNaN(f)) {
+			this.width = options.width;
+		} else {
+			this.width = Std.string(options.width) + "px";
+		}
+	}
+	if(options.culture != null) {
+		this.culture = Std.string(options.culture);
+	}
+	if(options.timestamp != null) {
+		this.recent = false;
+		this.timestamp = pmax_etc_DateToolsExtended.parseTimestamp(Std.string(options.timestamp));
+	}
+	if(options.continuous != null) {
+		this.continuous = options.continuous;
+	}
+	if(options.instanceName != null) {
+		this.instanceName = options.instanceName;
+	}
+	if(options.instanceLogo != null) {
+		this.instanceLogo = options.instanceLogo;
+	}
+	if(options.map != null) {
+		this.map = options.map;
+	}
+	if(options.weather != null) {
+		this.weather = options.weather;
+	}
+	if(options.timelapse != null) {
+		this.timelapse = options.timelapse;
+	}
+	if(options.showTimestamp != null) {
+		this.showTimestamp = options.showTimestamp;
+	}
+	if(options.noLink != null) {
+		this.noLink = options.noLink;
+	}
+	var tmp;
+	var o = window;
+	if(!Object.prototype.hasOwnProperty.call(o,"ontouchstart")) {
+		var o = window;
+		tmp = Object.prototype.hasOwnProperty.call(o,"DocumentTouch");
+	} else {
+		tmp = true;
+	}
+	if(tmp) {
+		this.timelapse = false;
+	}
+};
+pmax_config_ThumbnailConfig.__name__ = true;
+pmax_config_ThumbnailConfig.prototype = {
+	setResolution: function(resolution) {
+		this.resolution = resolution;
+	}
+	,setMode: function(mode) {
+		this.mode = mode;
+	}
+	,setCamId: function(camId) {
+		this.camId = camId;
+	}
+	,__class__: pmax_config_ThumbnailConfig
+};
+var pmax_etc_DateToolsExtended = function() { };
+pmax_etc_DateToolsExtended.__name__ = true;
+pmax_etc_DateToolsExtended.parseTimestamp = function(data) {
+	if(data == null) {
+		return null;
+	}
+	var parts = data.split(" ");
+	var date = pmax_etc_DateToolsExtended.parseDate(parts[0]);
+	if(date == null) {
+		return null;
+	}
+	var time = pmax_etc_DateToolsExtended.parseTime(parts[1]);
+	if(time == null) {
+		return null;
+	}
+	return new Date(date.getFullYear(),date.getMonth(),date.getDate(),time.getHours(),time.getMinutes(),time.getSeconds());
+};
+pmax_etc_DateToolsExtended.parseDate = function(data) {
+	if(data == null) {
+		return null;
+	}
+	var parts = data.split("-");
+	return new Date(Std.parseInt(parts[0]),Std.parseInt(parts[1]) - 1,Std.parseInt(parts[2]),0,0,0);
+};
+pmax_etc_DateToolsExtended.parseTime = function(data) {
+	if(data == null) {
+		return null;
+	}
+	var parts = data.split(":");
+	if(parts.length == 1) {
+		parts = data.split("-");
+	}
+	return new Date(0,0,0,Std.parseInt(parts[0]),Std.parseInt(parts[1]),Std.parseInt(parts[2]));
+};
+pmax_etc_DateToolsExtended.formatDateTime = function(date) {
+	if(date == null) {
+		return null;
+	}
+	return pmax_etc_DateToolsExtended.formatDate(date) + " " + pmax_etc_DateToolsExtended.formatTime(date);
+};
+pmax_etc_DateToolsExtended.formatDate = function(date) {
+	return DateTools.format(date,"%Y-%m-%d");
+};
+pmax_etc_DateToolsExtended.formatTime = function(date) {
+	return DateTools.format(date,"%H-%M-%S");
+};
+var pmax_etc_Dimension = function(width,height) {
+	this.width = width;
+	this.height = height;
+};
+pmax_etc_Dimension.__name__ = true;
+pmax_etc_Dimension.prototype = {
+	__class__: pmax_etc_Dimension
+};
+var pmax_etc_MapStorage = function() {
+};
+pmax_etc_MapStorage.__name__ = true;
+pmax_etc_MapStorage.prototype = {
+	getMap: function(countryCode) {
+		return pmax_Pmax.staticUrl + "/maps/" + countryCode + ".svg";
+	}
+	,__class__: pmax_etc_MapStorage
+};
+var pmax_etc_Resolution = function() { };
+pmax_etc_Resolution.__name__ = true;
+pmax_etc_Resolution.getHeight = function(resolution) {
+	switch(resolution) {
+	case "default":
+		return 800;
+	case "optimized":
+		return 300;
+	case "reduced":
+		return 450;
+	case "small":
+		return 150;
+	case "thumb":
+		return 75;
+	default:
+		return 75;
+	}
+};
+pmax_etc_Resolution.getBestResolution = function(height) {
+	if(height <= 75) {
+		return "thumb";
+	} else if(height <= 150) {
+		return "small";
+	} else if(height <= 300) {
+		return "optimized";
+	} else if(height <= 450) {
+		return "reduced";
+	}
+	return "default";
+};
+var pmax_remoting_JsonInterface = function(url,method) {
+	this.doneSignal = new msignal_EventSignal(this);
+	this.errorSignal = new msignal_EventSignal(this);
+	this.setUrlAndMethod(url,method);
+	this.loaded = false;
+	this.loading = false;
+	this.erroneous = false;
+};
+pmax_remoting_JsonInterface.__name__ = true;
+pmax_remoting_JsonInterface.prototype = {
+	setUrlAndMethod: function(url,method) {
+		this._url = url;
+		this._method = method;
+	}
+	,loadInternal: function(data) {
+		var _gthis = this;
+		this.loading = true;
+		this.erroneous = false;
+		var xhr = new XMLHttpRequest();
+		xhr.onreadystatechange = function() {
+			if(xhr.readyState == 4) {
+				if(xhr.status == 200) {
+					_gthis.onSuccess(xhr.response);
+				} else {
+					_gthis.onError(xhr.response);
+				}
+			}
+		};
+		var url = this._url;
+		var formData = null;
+		if(this._method == "GET") {
+			var query = [];
+			if(data != null) {
+				var h = data.h;
+				var key_h = h;
+				var key_keys = Object.keys(h);
+				var key_length = key_keys.length;
+				var key_current = 0;
+				while(key_current < key_length) {
+					var key = key_keys[key_current++];
+					query.push(this.encode(key) + "=" + this.encode(data.h[key]));
+				}
+			}
+			if(query.length > 0) {
+				url += "?" + query.join("&");
+			}
+		} else if(this._method == "POST") {
+			formData = new FormData();
+			var h = data.h;
+			var key_h = h;
+			var key_keys = Object.keys(h);
+			var key_length = key_keys.length;
+			var key_current = 0;
+			while(key_current < key_length) {
+				var key = key_keys[key_current++];
+				formData.set(key,data.h[key]);
+			}
+		}
+		xhr.open(this._method,url);
+		xhr.send(formData);
+		this._lastXhr = xhr;
+		return xhr;
+	}
+	,encode: function(string) {
+		return encodeURIComponent(string);
+	}
+	,cancel: function() {
+		if(!this.loading || this._lastXhr == null) {
+			return;
+		}
+		try {
+			this._lastXhr.abort();
+		} catch( _g ) {
+		}
+	}
+	,onError: function(response) {
+		this.onErroneous("Error",response);
+	}
+	,onSuccess: function(response) {
+		try {
+			var data;
+			if(Object.prototype.hasOwnProperty.call(JSON,"decode")) {
+				data = JSON.decode(response);
+			} else {
+				data = JSON.parse(response);
+			}
+			this.onData(data);
+			try {
+				this.onDone(data);
+			} catch( _g ) {
+				var error = haxe_Exception.caught(_g).unwrap();
+				this.onErroneous("Done handler threw an exception",error);
+			}
+		} catch( _g ) {
+			var error = haxe_Exception.caught(_g).unwrap();
+			this.onErroneous("Response not recognized",error);
+		}
+	}
+	,onDone: function(data) {
+		this.loaded = true;
+		this.loading = false;
+		this.doneSignal.dispatch(new msignal_Event(data));
+	}
+	,onErroneous: function(message,error) {
+		this.erroneous = true;
+		this.loading = false;
+		this.errorSignal.dispatch(new msignal_Event(error));
+	}
+	,onData: function(data) {
+		throw haxe_Exception.thrown("onData() is not implemented");
+	}
+	,__class__: pmax_remoting_JsonInterface
+};
+var pmax_remoting_MultiThumbnailData = function(thumbnails) {
+	this._maxInstancesPerRequest = 50;
+	this._thumbnails = thumbnails;
+	pmax_remoting_JsonInterface.call(this,pmax_Pmax.apiUrl + "/instances/thumbnails","GET");
+};
+pmax_remoting_MultiThumbnailData.__name__ = true;
+pmax_remoting_MultiThumbnailData.__super__ = pmax_remoting_JsonInterface;
+pmax_remoting_MultiThumbnailData.prototype = $extend(pmax_remoting_JsonInterface.prototype,{
+	load: function() {
+		if(this.loading) {
+			return;
+		}
+		var instanceIdMap = new haxe_ds_StringMap();
+		var thumbnail = this._thumbnails.iterator();
+		while(thumbnail.hasNext()) {
+			var thumbnail1 = thumbnail.next();
+			var instanceId = Std.string(thumbnail1.config.instance);
+			if(!Object.prototype.hasOwnProperty.call(instanceIdMap.h,instanceId)) {
+				instanceIdMap.h[instanceId] = instanceId;
+			}
+		}
+		var instanceIds = Lambda.array(instanceIdMap);
+		instanceIds.sort(function(a,b) {
+			if(Std.parseInt(a) < Std.parseInt(b)) {
+				return -1;
+			} else {
+				return 1;
+			}
+		});
+		var start = 0;
+		var end = Math.ceil(instanceIds.length / this._maxInstancesPerRequest);
+		var _g = start;
+		var _g1 = end;
+		while(_g < _g1) {
+			var i = _g++;
+			var partialInstanceIds = instanceIds.slice(i * this._maxInstancesPerRequest,(i + 1) * this._maxInstancesPerRequest);
+			this.setUrlAndMethod(pmax_Pmax.apiUrl + "/instances/thumbnails/" + partialInstanceIds.join(","),"GET");
+			this.loadInternal();
+		}
+	}
+	,onData: function(data) {
+		var instanceIdDataMap_h = Object.create(null);
+		var _g = 0;
+		var _g1 = js_Boot.__cast(data , Array);
+		while(_g < _g1.length) {
+			var rawThumbnailData = _g1[_g];
+			++_g;
+			instanceIdDataMap_h[Std.string(rawThumbnailData.instance.id)] = rawThumbnailData;
+		}
+		var thumbnail = this._thumbnails.iterator();
+		while(thumbnail.hasNext()) {
+			var thumbnail1 = thumbnail.next();
+			if(!Object.prototype.hasOwnProperty.call(instanceIdDataMap_h,thumbnail1.config.instance)) {
+				continue;
+			}
+			var rawThumbnailData = instanceIdDataMap_h[thumbnail1.config.instance];
+			thumbnail1.data.onData(rawThumbnailData);
+			thumbnail1.data.doneSignal.dispatch(new msignal_Event(rawThumbnailData));
+		}
+	}
+	,__class__: pmax_remoting_MultiThumbnailData
+});
+var pmax_remoting_ThumbnailData = function(config) {
+	this.clippingHeight = 1;
+	this.clippingWidth = 1;
+	this.clippingY = 0;
+	this.clippingX = 0;
+	this.countryLongitudeMax = 180;
+	this.countryLongitudeMin = -180;
+	this.countryLatitudeMax = -60;
+	this.countryLatitudeMin = 83.629244;
+	this.country = "world";
+	this._config = config;
+	pmax_remoting_JsonInterface.call(this,config.apiUrl + "/instances/" + config.instance + "/thumbnail","GET");
+};
+pmax_remoting_ThumbnailData.__name__ = true;
+pmax_remoting_ThumbnailData.__super__ = pmax_remoting_JsonInterface;
+pmax_remoting_ThumbnailData.prototype = $extend(pmax_remoting_JsonInterface.prototype,{
+	load: function() {
+		if(this.loading) {
+			return;
+		}
+		var sendData = new haxe_ds_StringMap();
+		if(this._config.timestamp != null) {
+			var value = pmax_etc_DateToolsExtended.formatDateTime(this._config.timestamp);
+			sendData.h["timestamp"] = value;
+		}
+		if(this._config.culture != null) {
+			sendData.h["culture"] = this._config.culture;
+		}
+		this.loadInternal(sendData);
+	}
+	,get_customized: function() {
+		if(!(this._config.timestamp != null || this._config.culture != null)) {
+			return this._config.apiUrl != pmax_Pmax.apiUrl;
+		} else {
+			return true;
+		}
+	}
+	,onData: function(data) {
+		this._loadedData = data;
+		this.refresh();
+	}
+	,refresh: function() {
+		this.dateImageMap = new haxe_ds_StringMap();
+		this.urlTimestampMap = new haxe_ds_StringMap();
+		this.dayImages = [];
+		try {
+			if(this._loadedData.mode != null) {
+				this._config.setMode(Std.string(this._loadedData.mode));
+			}
+			if(this._loadedData.instance != null) {
+				if(this._loadedData.instance.cam != null) {
+					if(this._loadedData.instance.cam.id != null) {
+						this._config.setCamId(Std.parseInt(Std.string(this._loadedData.instance.cam.id)));
+					}
+				}
+			}
+			if(this._loadedData.name != null) {
+				this.instanceName = Std.string(this._loadedData.name);
+			}
+			if(this._loadedData.url != null) {
+				this.instanceUrl = Std.string(this._loadedData.url);
+			}
+			if(this._loadedData.tourCam != null) {
+				this.tourCam = Std.string(this._loadedData.tourCam) == "true";
+			}
+			if(this._loadedData.zeroDirection != null) {
+				this.zeroDirection = parseFloat(Std.string(this._loadedData.zeroDirection));
+			}
+			if(this._loadedData.viewAngle != null) {
+				this.viewAngle = parseFloat(Std.string(this._loadedData.viewAngle));
+			}
+			if(this._loadedData.initialDirection != null) {
+				this.initialDirection = Std.parseInt(Std.string(this._loadedData.initialDirection));
+			}
+			if(this._loadedData.logo != null) {
+				this.logoUrl = Std.string(this._loadedData.logo);
+			}
+			if(this._loadedData.images != null) {
+				if(this._config.mode != "failover") {
+					var _g = 0;
+					var _g1 = Reflect.fields(this._loadedData.images);
+					while(_g < _g1.length) {
+						var dateTime = _g1[_g];
+						++_g;
+						var imageResolutions = Reflect.field(this._loadedData.images,dateTime);
+						if(!Object.prototype.hasOwnProperty.call(imageResolutions,this._config.resolution)) {
+							continue;
+						}
+						var imageUrl = Reflect.field(imageResolutions,this._config.resolution);
+						var imageTimestamp = pmax_etc_DateToolsExtended.parseTimestamp(dateTime);
+						var imageData = new pmax_thumbnail_data_ImageData(imageUrl,imageTimestamp);
+						this.dayImages.push(imageData);
+						this.dateImageMap.h[dateTime] = imageData;
+						this.urlTimestampMap.h[imageUrl] = imageData;
+					}
+					this.recentImage = this.dayImages.slice().pop();
+					if(this._config.timestamp != null) {
+						var imageTimestamp = DateTools.format(this._config.timestamp,"%Y-%m-%d %H-%M-%S");
+						if(Object.prototype.hasOwnProperty.call(this.dateImageMap.h,imageTimestamp)) {
+							this.recentImage = this.dateImageMap.h[imageTimestamp];
+						} else {
+							var bestMatch = null;
+							var minDiff = Infinity;
+							var h = this.dateImageMap.h;
+							var timestamp_h = h;
+							var timestamp_keys = Object.keys(h);
+							var timestamp_length = timestamp_keys.length;
+							var timestamp_current = 0;
+							while(timestamp_current < timestamp_length) {
+								var timestamp = timestamp_keys[timestamp_current++];
+								var date = pmax_etc_DateToolsExtended.parseTimestamp(timestamp);
+								var diff = Math.abs(date.getTime() - this._config.timestamp.getTime());
+								if(diff < minDiff) {
+									minDiff = diff;
+									bestMatch = timestamp;
+								}
+							}
+							if(bestMatch != null) {
+								this.recentImage = this.dateImageMap.h[bestMatch];
+							}
+						}
+					}
+				} else {
+					this.recentImage = new pmax_thumbnail_data_ImageData(this._config.failoverThumbnailImageBaseUrl + "/" + this._config.camId + "/recent_" + this._config.resolution + ".jpg",this._config.timestamp);
+				}
+			}
+			if(this._loadedData.weather != null) {
+				if(this._loadedData.weather.tempC != null) {
+					this.temperature = parseFloat(Std.string(this._loadedData.weather.tempC));
+				}
+				if(this._loadedData.weather.windSpeedKmh != null) {
+					this.windSpeed = Std.parseInt(Std.string(this._loadedData.weather.windSpeedKmh));
+				}
+				if(this._loadedData.weather.windDirectionDeg != null) {
+					this.windDirection = Std.parseInt(Std.string(this._loadedData.weather.windDirectionDeg));
+				}
+			}
+			if(this._loadedData.country != null) {
+				this.country = Std.string(this._loadedData.country.countryCode);
+				if(this._loadedData.country.latitudeMin != null) {
+					this.countryLatitudeMin = parseFloat(Std.string(this._loadedData.country.latitudeMin));
+				}
+				if(this._loadedData.country.latitudeMax != null) {
+					this.countryLatitudeMax = parseFloat(Std.string(this._loadedData.country.latitudeMax));
+				}
+				if(this._loadedData.country.longitudeMin != null) {
+					this.countryLongitudeMin = parseFloat(Std.string(this._loadedData.country.longitudeMin));
+				}
+				if(this._loadedData.country.longitudeMax != null) {
+					this.countryLongitudeMax = parseFloat(Std.string(this._loadedData.country.longitudeMax));
+				}
+			}
+			if(this._loadedData.position != null) {
+				if(this._loadedData.position.latitude != null) {
+					this.latitude = parseFloat(Std.string(this._loadedData.position.latitude));
+				}
+				if(this._loadedData.position.longitude != null) {
+					this.longitude = parseFloat(Std.string(this._loadedData.position.longitude));
+				}
+			}
+			if(this._loadedData.clipping != null) {
+				if(this._loadedData.clipping.x != null) {
+					this.clippingX = parseFloat(Std.string(this._loadedData.clipping.x));
+				}
+				if(this._loadedData.clipping.y != null) {
+					this.clippingY = parseFloat(Std.string(this._loadedData.clipping.y));
+				}
+				if(this._loadedData.clipping.width != null) {
+					this.clippingWidth = parseFloat(Std.string(this._loadedData.clipping.width));
+				}
+				if(this._loadedData.clipping.height != null) {
+					this.clippingHeight = parseFloat(Std.string(this._loadedData.clipping.height));
+				}
+			}
+		} catch( _g ) {
+			var error = haxe_Exception.caught(_g).unwrap();
+			throw haxe_Exception.thrown("Error occured while parsing the data: " + JSON.stringify(error));
+		}
+	}
+	,__class__: pmax_remoting_ThumbnailData
+});
+var pmax_thumbnail_ThumbnailItem = function(main,config,data) {
+	this._firstLoadErrorTimeout = 5;
+	this._firstLoadErrorCount = 0;
+	this._firstLoadErrorThreshold = 10;
+	this._firstLoad = true;
+	this._errorCount = 0;
+	this._errorThreshold = 3;
+	this.htmlDocument = null;
+	this.timelapse = null;
+	this.image = null;
+	this.map = null;
+	this.controls = null;
+	this.details = null;
+	this._main = main;
+	this.config = config;
+	this.data = data;
+	this.data.doneSignal.add($bind(this,this.populate));
+	this.data.errorSignal.add($bind(this,this.onError));
+	this.initializedSignal = new msignal_Signal0();
+	this.removedSignal = new msignal_Signal0();
+	this.init();
+};
+pmax_thumbnail_ThumbnailItem.__name__ = true;
+pmax_thumbnail_ThumbnailItem.prototype = {
+	refresh: function() {
+		this.data.load();
+	}
+	,onResize: function() {
+		if(this.image != null) {
+			this.image.resize();
+			this.image.draw();
+		}
+	}
+	,init: function() {
+		var _gthis = this;
+		var document = window.document;
+		this.htmlDocument = document;
+		var id = this.config.id;
+		var testElement = document.getElementById(id);
+		if(id == null || testElement != null && !((testElement) instanceof HTMLAnchorElement) && this.config.noLink == false) {
+			id = "gthumb_inst" + this.config.index;
+			var container = document.createElement("a");
+			container.id = id;
+			if(this.config.id == null) {
+				document.write(container.outerHTML);
+			} else {
+				testElement.appendChild(container);
+			}
+		}
+		var element = document.getElementById(id);
+		this.element = element;
+		if(!this.config.noLink) {
+			if(!((element) instanceof HTMLAnchorElement)) {
+				throw haxe_Exception.thrown("Element with id '" + id + "' must be an <a> tag!");
+			}
+			this.cont = js_Boot.__cast(element , HTMLAnchorElement);
+			this.cont.setAttribute("target",this.config.target);
+		} else {
+			this.cont = element;
+		}
+		this.cont.innerHTML = "";
+		this.cont.style.display = "block";
+		this.cont.style.position = "relative";
+		this.cont.style.clear = "both";
+		this.cont.style.width = this.config.width;
+		this.cont.style.fontFamily = "Arial, sans-serif";
+		this.cont.style.color = "#FFF";
+		this.cont.style.fontSize = "12px";
+		this.cont.style.lineHeight = "normal";
+		this.cont.style.overflow = "hidden";
+		this.cont.style.boxSizing = "border-box";
+		this.cont.style.textDecoration = "none";
+		this.cont.style.setProperty("user-select","none");
+		if(this.config.noLink) {
+			this.cont.style.cursor = "default";
+		}
+		this._observer = new MutationObserver(function(records,observer) {
+			var _g = 0;
+			while(_g < records.length) {
+				var record = records[_g];
+				++_g;
+				var _g1 = 0;
+				var _g2 = record.removedNodes;
+				while(_g1 < _g2.length) {
+					var removedNode = _g2[_g1];
+					++_g1;
+					if(removedNode == _gthis.cont) {
+						_gthis.removedSignal.dispatch();
+						break;
+					}
+				}
+			}
+		});
+		this._observer.observe(this.cont.parentNode,{ "childList" : true});
+		this.layout();
+		this.initializedSignal.dispatch();
+	}
+	,onError: function(signal) {
+		this._errorCount++;
+		if(this._firstLoad && this._firstLoadErrorCount < this._firstLoadErrorThreshold) {
+			this._firstLoadErrorCount++;
+			haxe_Timer.delay($bind(this,this.refresh),this._firstLoadErrorTimeout * 1000);
+			return;
+		}
+		if(this.image != null && this._errorCount < this._errorThreshold) {
+			return;
+		}
+		if(this._error != null) {
+			return;
+		}
+		this.showError();
+	}
+	,showError: function() {
+		this._error = window.document.createElement("span");
+		this._error.style.display = "block";
+		this._error.style.width = "100%";
+		this._error.style.height = "100%";
+		this._error.style.textAlign = "center";
+		this._error.style.fontSize = "25px";
+		this._error.style.paddingTop = "10px";
+		this._error.style.color = "#666";
+		this._error.style.backgroundColor = "#CCC";
+		this._error.style.zIndex = "10";
+		this._error.style.position = "absolute";
+		this._error.style.top = "0";
+		this._error.style.left = "0";
+		this._error.innerText = "Error loading panorama";
+		this.cont.appendChild(this._error);
+	}
+	,hideError: function() {
+		this._errorCount = 0;
+		if(this._error == null) {
+			return;
+		}
+		this._error.remove();
+		this._error = null;
+	}
+	,populate: function(signal) {
+		var _gthis = this;
+		this.hideError();
+		this._firstLoad = false;
+		this.layout();
+		if(this.data.instanceUrl != null && !this.config.noLink) {
+			var instanceUrl = this.data.instanceUrl;
+			if(this.config.timestamp != null) {
+				instanceUrl += "?t=" + DateTools.format(this.config.timestamp,"%Y-%m-%d %H-%M-%S");
+			}
+			this.cont.setAttribute("href",instanceUrl);
+			this.cont.onclick = function(event) {
+				_gthis.logClick(_gthis.config,"htmlThumbnail");
+			};
+		}
+		if(this.config.instanceName || this.config.instanceLogo) {
+			if(this.details != null) {
+				this.details.refresh();
+			} else {
+				this.details = new pmax_thumbnail_modules_ThumbnailDetails(this);
+			}
+		}
+		if(this.config.mode != "failover") {
+			if(this.config.timelapse) {
+				if(this.timelapse == null) {
+					this.timelapse = new pmax_thumbnail_modules_ThumbnailTimelapse(this);
+				}
+			}
+			if(this.config.weather || this.config.timelapse || this.config.showTimestamp) {
+				if(this.controls != null) {
+					this.controls.refresh();
+				} else {
+					this.controls = new pmax_thumbnail_modules_ThumbnailControls(this);
+				}
+			}
+			if(this.config.map) {
+				if(this.map != null) {
+					this.map.refresh();
+				} else {
+					this.map = new pmax_thumbnail_modules_ThumbnailMap(this);
+				}
+			}
+			if(this.timelapse != null && this.timelapse.get_running()) {
+				return;
+			}
+		}
+		if(this.image != null) {
+			this.image.refresh();
+		} else {
+			this.image = new pmax_thumbnail_modules_ThumbnailImage(this);
+			this.cont.addEventListener("start-animation",($_=this.image,$bind($_,$_.startAnimation)));
+			this.cont.addEventListener("stop-animation",($_=this.image,$bind($_,$_.stopAnimation)));
+		}
+	}
+	,tickHandler: function() {
+		if(this.image != null) {
+			this.image.animate();
+		}
+	}
+	,invalidate: function() {
+		var positionElementTop = this.element.getBoundingClientRect().top;
+		if(this.image != null) {
+			if(window.innerHeight > positionElementTop && positionElementTop > -this.image.getDimension().height) {
+				this.image.drawHandler();
+			}
+		}
+	}
+	,layout: function() {
+		var height = this.config.height;
+		if(height == null && this.data.clippingHeight < 1) {
+			haxe_Log.trace(this.config.instance,{ fileName : "src/pmax/thumbnail/ThumbnailItem.hx", lineNumber : 319, className : "pmax.thumbnail.ThumbnailItem", methodName : "layout", customParams : [this.config.resolution,this.config.resolution]});
+		}
+		if(height != null) {
+			var currentResHeight = pmax_etc_Resolution.getHeight(this.config.resolution);
+			var currentResHeightClipping = currentResHeight * this.data.clippingHeight | 0;
+			if(currentResHeight != currentResHeightClipping) {
+				var requiredResHeight = currentResHeight * (currentResHeight / currentResHeightClipping) | 0;
+				this.config.setResolution(pmax_etc_Resolution.getBestResolution(requiredResHeight));
+				this.data.refresh();
+			}
+			this.cont.style.height = height;
+			return;
+		}
+		var resolutionHeight = pmax_etc_Resolution.getHeight(this.config.resolution) * this.data.clippingHeight | 0;
+		this.cont.style.height = resolutionHeight + "px";
+	}
+	,logClick: function(config,type) {
+		if(type == null) {
+			type = "htmlThumbnailShow";
+		}
+		var logClickCall = new pmax_remoting_JsonInterface(config.apiUrl + "/instances/" + config.instance + "/log-click","POST");
+		if(logClickCall.loading) {
+			return;
+		}
+		var sendData = new haxe_ds_StringMap();
+		sendData.h["type"] = type;
+		logClickCall.loadInternal(sendData);
+	}
+	,__class__: pmax_thumbnail_ThumbnailItem
+};
+var pmax_thumbnail_ThumbnailManager = function() {
+	this._refreshInterval = 60;
+	this._invalidateInterval = 22;
+	this._tickInterval = 50;
+	this._placeTimeout = 150;
+	this._thumbnailsCount = 0;
+	this._thumbnails = new haxe_ds_IntMap();
+	this._thumbnailsCustomized = new haxe_ds_IntMap();
+	this._refreshTimer = new haxe_Timer(this._refreshInterval * 1000);
+	this._refreshTimer.run = $bind(this,this.refresh);
+	this._tickTimer = new haxe_Timer(this._tickInterval);
+	this._tickTimer.run = $bind(this,this.tickHandler);
+	this._invalidateTimer = new haxe_Timer(this._invalidateInterval);
+	this._invalidateTimer.run = $bind(this,this.invalidate);
+	window.onresize = $bind(this,this.onResize);
+};
+pmax_thumbnail_ThumbnailManager.__name__ = true;
+pmax_thumbnail_ThumbnailManager.prototype = {
+	place: function(options) {
+		var _gthis = this;
+		if(options.id == null && window.document.readyState == "complete") {
+			return;
+		}
+		var thumbnailId = this._thumbnailsCount++;
+		var config = new pmax_config_ThumbnailConfig(thumbnailId,options);
+		var data = new pmax_remoting_ThumbnailData(config);
+		var item = new pmax_thumbnail_ThumbnailItem(this,config,data);
+		item.removedSignal.addOnce(function() {
+			_gthis.onRemove(thumbnailId);
+		});
+		if(data.get_customized()) {
+			this._thumbnailsCustomized.h[thumbnailId] = item;
+		} else {
+			this._thumbnails.h[thumbnailId] = item;
+		}
+		if(this._placeTimer != null) {
+			this._placeTimer.stop();
+			this._placeTimer = null;
+		}
+		this._placeTimer = haxe_Timer.delay($bind(this,this.refresh),this._placeTimeout);
+	}
+	,refresh: function() {
+		var thumbnail = this._thumbnailsCustomized.iterator();
+		while(thumbnail.hasNext()) {
+			var thumbnail1 = [thumbnail.next()];
+			haxe_Timer.delay((function(thumbnail) {
+				return function() {
+					thumbnail[0].refresh();
+				};
+			})(thumbnail1),Math.random() * 1000 | 0);
+		}
+		var multiData = new pmax_remoting_MultiThumbnailData(this._thumbnails);
+		multiData.load();
+	}
+	,invalidate: function() {
+		var thumbnail = this._thumbnailsCustomized.iterator();
+		while(thumbnail.hasNext()) {
+			var thumbnail1 = thumbnail.next();
+			thumbnail1.invalidate();
+		}
+		var thumbnail = this._thumbnails.iterator();
+		while(thumbnail.hasNext()) {
+			var thumbnail1 = thumbnail.next();
+			thumbnail1.invalidate();
+		}
+	}
+	,tickHandler: function() {
+		var thumbnail = this._thumbnailsCustomized.iterator();
+		while(thumbnail.hasNext()) {
+			var thumbnail1 = thumbnail.next();
+			thumbnail1.tickHandler();
+		}
+		var thumbnail = this._thumbnails.iterator();
+		while(thumbnail.hasNext()) {
+			var thumbnail1 = thumbnail.next();
+			thumbnail1.tickHandler();
+		}
+	}
+	,onRemove: function(thumbnailId) {
+		this._thumbnails.remove(thumbnailId);
+		this._thumbnailsCustomized.remove(thumbnailId);
+	}
+	,onResize: function() {
+		var thumbnail = this._thumbnailsCustomized.iterator();
+		while(thumbnail.hasNext()) {
+			var thumbnail1 = thumbnail.next();
+			thumbnail1.onResize();
+		}
+		var thumbnail = this._thumbnails.iterator();
+		while(thumbnail.hasNext()) {
+			var thumbnail1 = thumbnail.next();
+			thumbnail1.onResize();
+		}
+	}
+	,__class__: pmax_thumbnail_ThumbnailManager
+};
+var pmax_thumbnail_data_ImageData = function(url,timestamp) {
+	this.url = url;
+	this.timestamp = timestamp;
+};
+pmax_thumbnail_data_ImageData.__name__ = true;
+pmax_thumbnail_data_ImageData.prototype = {
+	__class__: pmax_thumbnail_data_ImageData
+};
+var pmax_thumbnail_modules_ThumbnailCanvas = function(image,cont) {
+	this._invalid = false;
+	this.cont = cont;
+	this._image = image;
+	this._context = cont.getContext("2d",null);
+};
+pmax_thumbnail_modules_ThumbnailCanvas.__name__ = true;
+pmax_thumbnail_modules_ThumbnailCanvas.prototype = {
+	setDimensions: function(width,height) {
+		if(this.cont.width == width && this.cont.height == height) {
+			return;
+		}
+		this.cont.width = width;
+		this.cont.style.width = width + "px";
+		this.cont.height = height;
+		this.cont.style.height = height + "px";
+		this.invalidate();
+	}
+	,destroy: function() {
+		if(this.cont != null) {
+			this.cont.remove();
+		}
+	}
+	,invalidate: function() {
+		this._invalid = true;
+	}
+	,getContext: function() {
+		return this._context;
+	}
+	,drawHandler: function() {
+		if(this._invalid) {
+			this._image.draw();
+			this._invalid = false;
+		}
+	}
+	,clear: function() {
+		this._context.clearRect(0,0,this.cont.width,this.cont.height);
+	}
+	,hide: function() {
+		this.cont.style.display = "none";
+	}
+	,show: function() {
+		this.cont.style.display = "block";
+	}
+	,__class__: pmax_thumbnail_modules_ThumbnailCanvas
+};
+var pmax_thumbnail_modules_ThumbnailModule = function(item) {
+	this._item = item;
+	this.init();
+	if(this._item.cont != null && this._cont != null) {
+		this._item.cont.appendChild(this._cont);
+	}
+};
+pmax_thumbnail_modules_ThumbnailModule.__name__ = true;
+pmax_thumbnail_modules_ThumbnailModule.prototype = {
+	init: function() {
+		throw haxe_Exception.thrown("init() was not overwritten!");
+	}
+	,refresh: function() {
+		throw haxe_Exception.thrown("refresh() was not overwritten!");
+	}
+	,__class__: pmax_thumbnail_modules_ThumbnailModule
+};
+var pmax_thumbnail_modules_ThumbnailControls = function(item) {
+	this._timestampFormat = "%d.%m.%Y %H:%M";
+	this._timelapseInactiveColor = "#A6D100";
+	this._timelapseActiveColor = "#FFFFFF";
+	this._showWeather = false;
+	this._windIconUrl = "data:image/svg+xml;charset=utf-8;base64,PHN2ZyB3aWR0aD0iMTYiIGhlaWdodD0iMTYiIHZlcnNpb249IjEuMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB2aWV3Qm94PSIwIDAgMTU1MCAxNTUwIj4NCiAgICA8cGF0aCBzdHlsZT0iZmlsbDp3aGl0ZSIgZD0iTTAgNzY1cTAgMjA5IDEwMy41IDM4Ni41dDI4MC41IDI4MC41dDM4NSAxMDNxMTU2IDAgMjk4IC02MXQyNDUgLTE2NHQxNjQgLTI0NS41dDYxIC0yOTkuNXEwIC0xNTYgLTYxIC0yOTguNXQtMTY0IC0yNDV0LTI0NSAtMTYzdC0yOTggLTYwLjVxLTE1NyAwIC0yOTkuNSA2MXQtMjQ1LjUgMTY0dC0xNjMuNSAyNDQuNXQtNjAuNSAyOTcuNXpNMTY5IDc2NXEwIC0yNDMgMTc3IC00MjJxMTc3IC0xNzcgNDIzIC0xNzdxMTYyIDAgMzAwIDgwLjUgdDIxOSAyMTguNXQ4MSAzMDB0LTgxIDMwMC41dC0yMTkgMjE5dC0zMDAgODAuNXQtMzAwIC04MC41dC0yMTkgLTIxOXQtODEgLTMwMC41ek01MDMgMzY2bDI1NiA4OTVxMSAxMCAxMCAxMHQxMCAtMTBsMjU1IC04OTVxNCAtMTEgLTEuNSAtMTd0LTE2LjUgMGwtMjM3IDg5cS0xMCA0IC0yMCAwbC0yMzkgLTg5cS0xMCAtNiAtMTQuNSAwdC0yLjUgMTd6IiAvPg0KPC9zdmc+";
+	this._thermometerIconUrl = "data:image/svg+xml;charset=utf-8;base64,PHN2ZyB3aWR0aD0iMTYiIGhlaWdodD0iMTYiIHZlcnNpb249IjEuMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB2aWV3Qm94PSItNTUwIC0zMDAgMjUwMCAyNTAwIj4NCiAgICA8cGF0aCBzdHlsZT0iZmlsbDp3aGl0ZSIgZD0iTTAgMjQ1cTAgMTM2IDYzIDI1My41dDE3NiAxOTYuNXYxMDU4cTAgMTI4IDg4IDIxN3QyMTYgODlxMTI5IDAgMjE3LjUgLTg5dDg4LjUgLTIxN3YtMTA1OHExMTMgLTc5IDE3NSAtMTk2LjV0NjIgLTI1My41cTAgLTE0OCAtNzIuNSAtMjczdC0xOTcuNSAtMTk3LjV0LTI3MyAtNzIuNXEtMTQ3IDAgLTI3MiA3Mi41dC0xOTggMTk3LjV0LTczIDI3M3pNMTg3IDI0NXEwIC0xNDkgMTA0LjUgLTI1NC41dDI1MS41IC0xMDUuNSBxMTQ5IDAgMjU2LjUgMTA3dDEwNy41IDI1M3EwIDEwMCAtNTEuNSAxODQuNXQtMTQwLjUgMTMxLjVsLTMwIDE1cS0xNiA3IC0xNiAzMXYxMTQ2cTAgNTIgLTM2IDg2dC05MCAzNHEtNTIgMCAtODguNSAtMzR0LTM2LjUgLTg2di0xMTQ2cTAgLTI0IC0xNSAtMzFsLTI5IC0xNXEtODggLTQ3IC0xMzcuNSAtMTMxdC00OS41IC0xODV6IiAvPg0KPC9zdmc+";
+	pmax_thumbnail_modules_ThumbnailModule.call(this,item);
+};
+pmax_thumbnail_modules_ThumbnailControls.__name__ = true;
+pmax_thumbnail_modules_ThumbnailControls.__super__ = pmax_thumbnail_modules_ThumbnailModule;
+pmax_thumbnail_modules_ThumbnailControls.prototype = $extend(pmax_thumbnail_modules_ThumbnailModule.prototype,{
+	init: function() {
+		this._cont = window.document.createElement("span");
+		this._cont.style.display = "block";
+		this._cont.style.position = "absolute";
+		this._cont.style.bottom = "0";
+		this._cont.style.left = "0";
+		this._cont.style.height = "16px";
+		this._showWeather = this._item.config.weather && (this._item.data.temperature != null || this._item.data.windSpeed != null);
+		if(this._showWeather) {
+			this.initWeatherDisplay();
+		}
+		if(this._item.config.timelapse) {
+			this.initTimelapseDisplay();
+		}
+		if(this._item.config.showTimestamp || this._item.config.timelapse) {
+			this.initTimestampDisplay();
+		}
+		this.refresh();
+	}
+	,initWeatherDisplay: function() {
+		this._weather = window.document.createElement("span");
+		this._weather.style.verticalAlign = "top";
+		this._weather.style.backgroundColor = "rgba(0, 0, 0, 0.7)";
+		this._weather.style.display = "inline-block";
+		this._weather.style.paddingTop = "1px";
+		this._weather.style.paddingLeft = "2px";
+		this._weather.style.height = "100%";
+		this._cont.appendChild(this._weather);
+		var placeholder = window.document.createElement("span");
+		placeholder.style.position = "relative";
+		placeholder.style.width = "10px";
+		placeholder.style.height = "100%";
+		placeholder.style.display = "inline-block";
+		var triangleWeather = window.document.createElement("span");
+		triangleWeather.style.position = "absolute";
+		triangleWeather.style.top = "0";
+		triangleWeather.style.left = "0";
+		triangleWeather.style.width = "0";
+		triangleWeather.style.height = "0";
+		triangleWeather.style.borderBottom = "16px solid rgba(0, 0, 0, 0.7)";
+		triangleWeather.style.borderRight = "10px solid transparent";
+		placeholder.appendChild(triangleWeather);
+		if(this._item.config.timelapse) {
+			this._triangleTimelapseLeft = window.document.createElement("span");
+			this._triangleTimelapseLeft.style.position = "absolute";
+			this._triangleTimelapseLeft.style.top = "0";
+			this._triangleTimelapseLeft.style.left = "0";
+			this._triangleTimelapseLeft.style.width = "0";
+			this._triangleTimelapseLeft.style.height = "0";
+			this._triangleTimelapseLeft.style.borderTop = "16px solid #A6D100";
+			this._triangleTimelapseLeft.style.borderLeft = "10px solid transparent";
+			placeholder.appendChild(this._triangleTimelapseLeft);
+		}
+		this._cont.appendChild(placeholder);
+	}
+	,initTimelapseDisplay: function() {
+		this._timelapse = window.document.createElement("span");
+		this._timelapse.style.position = "relative";
+		this._timelapse.style.backgroundColor = this._timelapseInactiveColor;
+		this._timelapse.style.width = "28px";
+		this._timelapse.style.height = "100%";
+		this._timelapse.style.display = "inline-block";
+		var timelapsePlayLeft = window.document.createElement("span");
+		timelapsePlayLeft.style.position = "absolute";
+		timelapsePlayLeft.style.top = "3px";
+		timelapsePlayLeft.style.left = "10px";
+		timelapsePlayLeft.style.width = "0";
+		timelapsePlayLeft.style.height = "0";
+		timelapsePlayLeft.style.borderTop = "5px solid transparent";
+		timelapsePlayLeft.style.borderLeft = "5px solid #000";
+		timelapsePlayLeft.style.borderBottom = "5px solid transparent";
+		this._timelapse.appendChild(timelapsePlayLeft);
+		var timelapsePlayRight = window.document.createElement("span");
+		timelapsePlayRight.style.position = "absolute";
+		timelapsePlayRight.style.top = "3px";
+		timelapsePlayRight.style.left = "15px";
+		timelapsePlayRight.style.width = "0";
+		timelapsePlayRight.style.height = "0";
+		timelapsePlayRight.style.borderTop = "5px solid transparent";
+		timelapsePlayRight.style.borderLeft = "5px solid #000";
+		timelapsePlayRight.style.borderBottom = "5px solid transparent";
+		this._timelapse.appendChild(timelapsePlayRight);
+		this._triangleTimelapseRight = window.document.createElement("span");
+		this._triangleTimelapseRight.style.position = "absolute";
+		this._triangleTimelapseRight.style.top = "0";
+		this._triangleTimelapseRight.style.right = "-10px";
+		this._triangleTimelapseRight.style.width = "0";
+		this._triangleTimelapseRight.style.height = "0";
+		this._triangleTimelapseRight.style.borderBottom = "16px solid " + this._timelapseInactiveColor;
+		this._triangleTimelapseRight.style.borderRight = "10px solid transparent";
+		this._timelapse.appendChild(this._triangleTimelapseRight);
+		this._timelapse.addEventListener("mouseenter",$bind(this,this.startTimelapse));
+		this._timelapse.addEventListener("mouseleave",$bind(this,this.stopTimelapse));
+		this._cont.appendChild(this._timelapse);
+	}
+	,initTimestampDisplay: function() {
+		this._timestampCont = window.document.createElement("span");
+		this._timestampCont.style.position = "relative";
+		this._timestampCont.style.verticalAlign = "top";
+		this._timestampCont.style.backgroundColor = "rgba(0, 0, 0, 0.7)";
+		this._timestampCont.style.paddingTop = "1px";
+		this._timestampCont.style.paddingRight = "2px";
+		this._timestampCont.style.height = "100%";
+		this._timestampCont.style.display = "inline-block";
+		this._timestampCont.style.paddingLeft = "3px";
+		if(this._item.config.timelapse) {
+			this._timestampCont.style.marginLeft = "10px";
+		} else if(this._showWeather) {
+			this._timestampCont.style.marginLeft = "2px";
+		}
+		if(this._item.config.timelapse || this._showWeather) {
+			this._timestampCont.style.paddingLeft = "0";
+			var triangleTimestampLeft = window.document.createElement("span");
+			triangleTimestampLeft.style.position = "absolute";
+			triangleTimestampLeft.style.top = "0";
+			triangleTimestampLeft.style.left = "-10px";
+			triangleTimestampLeft.style.width = "0";
+			triangleTimestampLeft.style.height = "0";
+			triangleTimestampLeft.style.borderTop = "16px solid rgba(0, 0, 0, 0.7)";
+			triangleTimestampLeft.style.borderLeft = "10px solid transparent";
+			this._timestampCont.appendChild(triangleTimestampLeft);
+		}
+		var triangleTimestampRight = window.document.createElement("span");
+		triangleTimestampRight.style.position = "absolute";
+		triangleTimestampRight.style.top = "0";
+		triangleTimestampRight.style.left = "100%";
+		triangleTimestampRight.style.width = "0";
+		triangleTimestampRight.style.height = "0";
+		triangleTimestampRight.style.borderBottom = "16px solid rgba(0, 0, 0, 0.7)";
+		triangleTimestampRight.style.borderRight = "10px solid transparent";
+		this._timestampCont.appendChild(triangleTimestampRight);
+		this._timestamp = window.document.createElement("span");
+		this._timestampCont.appendChild(this._timestamp);
+		this._cont.appendChild(this._timestampCont);
+	}
+	,refresh: function() {
+		if(this._item.config.weather) {
+			var weatherText = [];
+			if(this._item.data.temperature != null) {
+				var thermometerIcon = new Image();
+				thermometerIcon.src = this._thermometerIconUrl;
+				thermometerIcon.style.verticalAlign = "top";
+				thermometerIcon.style.width = "14px";
+				thermometerIcon.style.height = "14px";
+				thermometerIcon.style.transform = "rotate(180deg)";
+				thermometerIcon.style.boxShadow = "none";
+				thermometerIcon.style.border = "none";
+				thermometerIcon.style.setProperty("margin","0","important");
+				weatherText.push(thermometerIcon.outerHTML);
+				weatherText.push(this._item.data.temperature + "&deg;C");
+			}
+			if(this._item.data.windSpeed != null) {
+				var windIcon = new Image();
+				windIcon.src = this._windIconUrl;
+				windIcon.style.verticalAlign = "top";
+				windIcon.style.width = "14px";
+				windIcon.style.height = "14px";
+				windIcon.style.boxShadow = "none";
+				windIcon.style.border = "none";
+				windIcon.style.setProperty("margin","0","important");
+				if(this._item.data.windDirection != null) {
+					windIcon.style.transform = "rotate(" + (this._item.data.windDirection + 180) + "deg)";
+				} else {
+					windIcon.style.transform = "rotate(-135deg)";
+				}
+				if(this._item.data.temperature != null) {
+					windIcon.style.marginLeft = "5px";
+				}
+				weatherText.push(windIcon.outerHTML);
+				weatherText.push(this._item.data.windSpeed + " km/h");
+			}
+			if(weatherText.length > 0) {
+				this._weather.innerHTML = weatherText.join(" ");
+			}
+		}
+		if(this._item.config.timelapse) {
+			if(this._item.timelapse.get_running() || this._item.config.showTimestamp) {
+				if(this._item.image != null && this._item.image.currentImage != null) {
+					this._timestampCont.style.display = "inline-block";
+					var currentImageData = this._item.data.urlTimestampMap.h[this._item.image.currentImage.src];
+					this._timestamp.innerHTML = DateTools.format(currentImageData.timestamp,this._timestampFormat);
+				}
+			} else {
+				this._timestampCont.style.display = "none";
+			}
+		} else if(this._item.config.showTimestamp && this._item.image != null) {
+			var currentImageData = this._item.data.urlTimestampMap.h[this._item.image.currentImage.src];
+			this._timestamp.innerHTML = DateTools.format(currentImageData.timestamp,this._timestampFormat);
+		}
+	}
+	,startTimelapse: function() {
+		this._timelapse.style.backgroundColor = this._timelapseActiveColor;
+		if(this._triangleTimelapseLeft != null) {
+			this._triangleTimelapseLeft.style.borderTopColor = this._timelapseActiveColor;
+		}
+		this._triangleTimelapseRight.style.borderBottomColor = this._timelapseActiveColor;
+		this._item.timelapse.startTimelapse();
+	}
+	,stopTimelapse: function() {
+		this._timelapse.style.backgroundColor = this._timelapseInactiveColor;
+		if(this._triangleTimelapseLeft != null) {
+			this._triangleTimelapseLeft.style.borderTopColor = this._timelapseInactiveColor;
+		}
+		this._triangleTimelapseRight.style.borderBottomColor = this._timelapseInactiveColor;
+		this._item.timelapse.stopTimelapse();
+	}
+	,__class__: pmax_thumbnail_modules_ThumbnailControls
+});
+var pmax_thumbnail_modules_ThumbnailDetails = function(item) {
+	pmax_thumbnail_modules_ThumbnailModule.call(this,item);
+};
+pmax_thumbnail_modules_ThumbnailDetails.__name__ = true;
+pmax_thumbnail_modules_ThumbnailDetails.__super__ = pmax_thumbnail_modules_ThumbnailModule;
+pmax_thumbnail_modules_ThumbnailDetails.prototype = $extend(pmax_thumbnail_modules_ThumbnailModule.prototype,{
+	init: function() {
+		this._cont = window.document.createElement("span");
+		this._cont.style.display = "block";
+		this._cont.style.position = "absolute";
+		this._cont.style.top = "0";
+		this._cont.style.left = "0";
+		this._cont.style.height = "16px";
+		this._cont.style.width = "100%";
+		this._cont.style.boxSizing = "border-box";
+		this._cont.style.whiteSpace = "nowrap";
+		this._cont.style.textAlign = "left";
+		this._cont.style.paddingRight = "10px";
+		if(this._item.config.map && this._item.cont.offsetHeight <= 90) {
+			this._cont.style.paddingRight = "100px";
+		}
+		if(this._item.config.instanceLogo && this._item.data.logoUrl != null) {
+			var logoHeight = Math.log(this._item.cont.clientHeight) * 15 - 35 | 0;
+			this._logo = new Image();
+			this._logo.src = this._item.data.logoUrl;
+			this._logo.style.maxHeight = logoHeight + "px";
+			this._logo.style.width = "auto";
+			this._logo.style.margin = "0";
+			this._logo.style.marginTop = "2px";
+			this._logo.style.marginLeft = "2px";
+			this._logo.style.boxShadow = "none";
+			this._logo.style.border = "none";
+			if(this._item.config.instanceName && this._item.data.instanceName != null) {
+				this._logo.style.position = "absolute";
+				this._logo.style.top = "100%";
+			}
+			this._cont.appendChild(this._logo);
+		}
+		if(this._item.config.instanceName && this._item.data.instanceName != null) {
+			this._backgroundText = window.document.createElement("span");
+			this._backgroundText.style.display = "inline-block";
+			this._backgroundText.style.backgroundColor = "rgba(0, 0, 0, 0.7)";
+			this._backgroundText.style.height = "16px";
+			this._backgroundText.style.position = "relative";
+			this._backgroundText.style.verticalAlign = "top";
+			this._backgroundText.style.maxWidth = "100%";
+			this._backgroundText.style.paddingTop = "1px";
+			this._backgroundText.style.paddingLeft = "2px";
+			this._instanceName = window.document.createElement("span");
+			this._instanceName.style.paddingLeft = "1px";
+			this._instanceName.style.verticalAlign = "top";
+			this._instanceName.style.whiteSpace = "nowrap";
+			this._instanceName.style.overflow = "hidden";
+			this._instanceName.style.textOverflow = "ellipsis";
+			this._instanceName.style.display = "block";
+			this._instanceName.style.textDecoration = "none";
+			this._instanceName.style.color = "#FFFFFF";
+			this._backgroundText.appendChild(this._instanceName);
+			var triangle = window.document.createElement("span");
+			triangle.style.position = "absolute";
+			triangle.style.top = "0";
+			triangle.style.right = "-10px";
+			triangle.style.width = "0";
+			triangle.style.height = "0";
+			triangle.style.borderTop = "16px solid rgba(0, 0, 0, 0.7)";
+			triangle.style.borderRight = "10px solid transparent";
+			this._backgroundText.appendChild(triangle);
+			this._cont.appendChild(this._backgroundText);
+		}
+		this.refresh();
+	}
+	,refresh: function() {
+		if(this._logo != null) {
+			this._logo.src = this._item.data.logoUrl;
+		}
+		if(this._instanceName != null) {
+			this._instanceName.innerText = this._item.data.instanceName;
+		}
+	}
+	,__class__: pmax_thumbnail_modules_ThumbnailDetails
+});
+var pmax_thumbnail_modules_ThumbnailImage = function(item) {
+	this._fadingTimerInterval = 20;
+	this._fadingOpacityStep = 10;
+	this._animationOffset = 0;
+	this._animationIncrement = -1;
+	this._animationStopped = false;
+	this._firstAnimation = true;
+	pmax_thumbnail_modules_ThumbnailModule.call(this,item);
+};
+pmax_thumbnail_modules_ThumbnailImage.__name__ = true;
+pmax_thumbnail_modules_ThumbnailImage.__super__ = pmax_thumbnail_modules_ThumbnailModule;
+pmax_thumbnail_modules_ThumbnailImage.prototype = $extend(pmax_thumbnail_modules_ThumbnailModule.prototype,{
+	init: function() {
+		this._cont = window.document.createElement("span");
+		this._cont.style.display = "block";
+		this._cont.style.whiteSpace = "nowrap";
+		this._cont.style.height = "100%";
+		this.currentImage = new Image();
+		this._loadingImagesMap = new haxe_ds_StringMap();
+		this._loadedImagesMap = new haxe_ds_StringMap();
+		this.refresh();
+	}
+	,refresh: function() {
+		var imageUrl = this._item.data.recentImage.url;
+		this.showImage(imageUrl);
+	}
+	,getImageOffset: function() {
+		if(this._item.data.initialDirection == null || this._item.data.zeroDirection == null || this._item.data.viewAngle == null) {
+			return 0;
+		}
+		var imageDimensions = this.getDimension();
+		var degreesToMove = -(this._item.data.initialDirection - this._item.data.zeroDirection + this._item.data.viewAngle / 2);
+		var pixelsToMove = degreesToMove / this._item.data.viewAngle * imageDimensions.width + this._item.cont.offsetWidth / 2;
+		while(pixelsToMove > 0) pixelsToMove -= imageDimensions.width;
+		return pixelsToMove;
+	}
+	,getLoadedImages: function() {
+		var loadedImages = [];
+		var h = this._loadedImagesMap.h;
+		var imageUrl_h = h;
+		var imageUrl_keys = Object.keys(h);
+		var imageUrl_length = imageUrl_keys.length;
+		var imageUrl_current = 0;
+		while(imageUrl_current < imageUrl_length) {
+			var imageUrl = imageUrl_keys[imageUrl_current++];
+			loadedImages.push(imageUrl);
+		}
+		loadedImages.sort(function(a,b) {
+			return Reflect.compare(a.toLowerCase(),b.toLowerCase());
+		});
+		return loadedImages;
+	}
+	,loadImage: function(imageUrl,onLoad) {
+		var _gthis = this;
+		if(Object.prototype.hasOwnProperty.call(this._loadedImagesMap.h,imageUrl)) {
+			if(onLoad != null) {
+				onLoad();
+			}
+			return;
+		}
+		if(Object.prototype.hasOwnProperty.call(this._loadingImagesMap.h,imageUrl)) {
+			return;
+		}
+		var image = new Image();
+		image.src = imageUrl;
+		image.onload = function() {
+			_gthis._loadedImagesMap.h[imageUrl] = image;
+			var _this = _gthis._loadingImagesMap;
+			if(Object.prototype.hasOwnProperty.call(_this.h,imageUrl)) {
+				delete(_this.h[imageUrl]);
+			}
+			if(onLoad != null) {
+				onLoad();
+			}
+		};
+		this._loadingImagesMap.h[imageUrl] = image;
+	}
+	,showImage: function(imageUrl,fadeOut) {
+		if(fadeOut == null) {
+			fadeOut = false;
+		}
+		var _gthis = this;
+		if(imageUrl == this.currentImage.src) {
+			return;
+		}
+		this._previousImage = new Image();
+		this._previousImage.src = this.currentImage.src;
+		this.loadImage(imageUrl,function() {
+			_gthis.currentImage.src = imageUrl;
+			if(_gthis._item.controls != null) {
+				_gthis._item.controls.refresh();
+			}
+			if(_gthis._canvas == null) {
+				_gthis.initCanvas();
+			}
+			_gthis.resize();
+			if(fadeOut) {
+				_gthis.fadeOut();
+			} else {
+				_gthis.draw();
+				_gthis.startAnimation();
+			}
+			haxe_Timer.delay(function() {
+				_gthis._item.logClick(_gthis._item.config);
+			},1500);
+		});
+	}
+	,fadeOut: function() {
+		var _gthis = this;
+		if(this._fadingTimer != null) {
+			this._fadingTimer.stop();
+		}
+		var opacity = 100;
+		this._fadingTimer = new haxe_Timer(this._fadingTimerInterval);
+		this._fadingTimer.run = function() {
+			opacity -= _gthis._fadingOpacityStep;
+			if(opacity <= 0) {
+				opacity = 0;
+			}
+			_gthis.draw(_gthis.currentImage,1);
+			_gthis.draw(_gthis._previousImage,opacity / 100);
+			if(opacity <= 0) {
+				_gthis._fadingTimer.stop();
+			}
+		};
+	}
+	,resize: function() {
+		if(this._canvas == null) {
+			return;
+		}
+		this._canvas.setDimensions(this._cont.offsetWidth,this._cont.offsetHeight);
+	}
+	,clear: function() {
+		if(this._canvas == null) {
+			return;
+		}
+		this._canvas.clear();
+	}
+	,drawHandler: function() {
+		if(this._canvas == null) {
+			return;
+		}
+		this._canvas.drawHandler();
+	}
+	,draw: function(drawImage,opacity) {
+		if(opacity == null) {
+			opacity = 1;
+		}
+		if(this._canvas == null) {
+			return;
+		}
+		if(drawImage == null) {
+			drawImage = this.currentImage;
+		}
+		var imageCount = 1;
+		var dimension = this.getDimension(drawImage);
+		if(this._item.config.continuous) {
+			imageCount += Math.ceil(this._item.cont.offsetWidth / dimension.width);
+		} else {
+			this._item.cont.style.maxWidth = Std.string(dimension.width + "px");
+			this.resize();
+		}
+		this._canvas.getContext().globalAlpha = opacity;
+		var _g = 0;
+		var _g1 = imageCount;
+		while(_g < _g1) {
+			var i = _g++;
+			this._canvas.getContext().drawImage(drawImage,this._item.data.clippingX * drawImage.width | 0,this._item.data.clippingY * drawImage.height | 0,this._item.data.clippingWidth * drawImage.width | 0,this._item.data.clippingHeight * drawImage.height | 0,i * dimension.width + this._animationOffset,0,dimension.width,dimension.height);
+		}
+	}
+	,initCanvas: function() {
+		var canvasElem = window.document.createElement("canvas");
+		if(this._canvas == null) {
+			this._canvas = new pmax_thumbnail_modules_ThumbnailCanvas(this,canvasElem);
+		} else {
+			this._canvas.cont = canvasElem;
+		}
+		this._cont.appendChild(canvasElem);
+	}
+	,startAnimation: function() {
+		this._animationStopped = false;
+	}
+	,stopAnimation: function() {
+		this._animationStopped = true;
+	}
+	,getDimension: function(image) {
+		if(image == null) {
+			image = this.currentImage;
+		}
+		var imageWidth = this._item.data.clippingWidth * image.width | 0;
+		var imageHeight = this._item.data.clippingHeight * image.height | 0;
+		var imageRatio = imageWidth / imageHeight;
+		var itemWidth = this._cont.offsetWidth;
+		var itemHeight = this._cont.offsetHeight;
+		if(imageHeight != itemHeight) {
+			imageHeight = itemHeight;
+			imageWidth = Math.ceil(imageHeight * imageRatio);
+		}
+		return new pmax_etc_Dimension(imageWidth,imageHeight);
+	}
+	,animate: function() {
+		if(this._animationStopped || this._canvas == null || this.currentImage == null) {
+			return;
+		}
+		var oldAnimationOfffset = this._animationOffset;
+		this._animationOffset += this._animationIncrement;
+		if(this._firstAnimation) {
+			this._animationOffset += this.getImageOffset() | 0;
+			this._firstAnimation = false;
+		}
+		var dimensions = this.getDimension();
+		if(this._item.config.continuous) {
+			if(this._animationOffset < -dimensions.width) {
+				this._animationOffset += dimensions.width;
+			}
+		} else if(this._item.cont.offsetWidth >= dimensions.width || dimensions.width - this._item.cont.offsetWidth < dimensions.width * 0.2) {
+			this._animationOffset = Math.round(this._item.cont.offsetWidth / 2 - dimensions.width / 2);
+		} else if(this._animationOffset <= this._item.cont.offsetWidth - dimensions.width || this._animationOffset >= 0) {
+			if(this._animationOffset > 0) {
+				this._animationOffset = 0;
+			}
+			if(this._animationOffset < this._item.cont.offsetWidth - dimensions.width) {
+				this._animationOffset = this._item.cont.offsetWidth - dimensions.width;
+			}
+			this._animationIncrement *= -1;
+		}
+		if(oldAnimationOfffset != this._animationOffset) {
+			this._canvas.invalidate();
+		}
+	}
+	,__class__: pmax_thumbnail_modules_ThumbnailImage
+});
+var pmax_thumbnail_modules_ThumbnailMap = function(item) {
+	pmax_thumbnail_modules_ThumbnailModule.call(this,item);
+};
+pmax_thumbnail_modules_ThumbnailMap.__name__ = true;
+pmax_thumbnail_modules_ThumbnailMap.__super__ = pmax_thumbnail_modules_ThumbnailModule;
+pmax_thumbnail_modules_ThumbnailMap.prototype = $extend(pmax_thumbnail_modules_ThumbnailModule.prototype,{
+	init: function() {
+		if(this._item.data.country == null && !this._item.data.tourCam || this._item.data.latitude == null || this._item.data.longitude == null) {
+			return;
+		}
+		this._mapStorage = new pmax_etc_MapStorage();
+		this._cont = window.document.createElement("span");
+		this._cont.style.display = "block";
+		this._cont.style.position = "absolute";
+		this._cont.style.right = "0";
+		this._cont.style.bottom = "0";
+		this._cont.style.width = "90px";
+		this._cont.style.height = "75px";
+		this._mapContainer = window.document.createElement("span");
+		this._mapContainer.style.display = "block";
+		this._mapContainer.style.position = "absolute";
+		this._mapContainer.style.bottom = "5px";
+		this._mapContainer.style.right = "5px";
+		this._mapContainer.style.maxWidth = "85px";
+		this._mapContainer.style.maxHeight = "65px";
+		this._mapContainer.style.fontSize = "0";
+		this._mapContainer.style.width = "85px";
+		this._mapContainer.style.textAlign = "right";
+		this._map = new Image();
+		this._map.style.boxShadow = "none";
+		this._map.style.border = "none";
+		this._map.style.setProperty("margin","0","important");
+		this._map.style.transition = "none";
+		this._map.style.display = "inline-block";
+		this._pointer = window.document.createElement("span");
+		this._pointer.style.display = "block";
+		this._pointer.style.width = "4px";
+		this._pointer.style.height = "4px";
+		this._pointer.style.backgroundColor = "#A6D100";
+		this._pointer.style.border = "1px solid #000";
+		this._pointer.style.position = "absolute";
+		this._pointer.style.borderRadius = "50%";
+		this._pointer.style.boxSizing = "content-box";
+		this._mapContainer.appendChild(this._map);
+		this._mapContainer.appendChild(this._pointer);
+		this._cont.appendChild(this._mapContainer);
+		this.refresh();
+	}
+	,setPointer: function(latitude,longitude) {
+		var latTop = this._item.data.countryLatitudeMin;
+		var latBottom = this._item.data.countryLatitudeMax;
+		var normLat = latitude - latTop;
+		var normLatBottom = latBottom - latTop;
+		var latPercentage = normLat / normLatBottom;
+		var lngLeft = this._item.data.countryLongitudeMin;
+		var lngRight = this._item.data.countryLongitudeMax;
+		var normLng = longitude - lngLeft;
+		var normLngRight = lngRight - lngLeft;
+		var lngPercentage = normLng / normLngRight;
+		var bottomOffset = 1 - latPercentage;
+		var rightOffset = 1 - lngPercentage;
+		this._pointer.style.bottom = bottomOffset * this._map.offsetHeight - this._pointer.offsetHeight / 2 + "px";
+		this._pointer.style.right = rightOffset * this._map.offsetWidth - this._pointer.offsetWidth / 2 + "px";
+	}
+	,refresh: function() {
+		var _gthis = this;
+		if(this._cont == null || this._map == null) {
+			return;
+		}
+		var country = this._item.data.country;
+		if(this._item.data.tourCam) {
+			country = "world";
+		}
+		if(country == null || country == "") {
+			return;
+		}
+		var mapUrl = this._mapStorage.getMap(country);
+		if(mapUrl == null) {
+			this._cont.style.display = "none";
+			return;
+		} else {
+			this._cont.style.display = "block";
+		}
+		this._map.onload = function() {
+			_gthis._map.style.height = _gthis._map.offsetHeight + "px";
+			_gthis._map.style.width = _gthis._map.offsetWidth + "px";
+			_gthis.fitMap();
+			if(_gthis._item.data.latitude != null && _gthis._item.data.longitude != null) {
+				_gthis.setPointer(_gthis._item.data.latitude,_gthis._item.data.longitude);
+			}
+		};
+		if(mapUrl != this._map.src) {
+			this._map.src = mapUrl;
+		}
+	}
+	,fitMap: function() {
+		var maxWidth = 85;
+		var maxHeight = 65;
+		var mapWidth = this._map.offsetWidth;
+		var mapHeight = this._map.offsetHeight;
+		if(mapWidth > maxWidth) {
+			var ratio = maxWidth / this._map.offsetWidth;
+			this._map.style.width = maxWidth + "px";
+			this._map.style.height = Math.round(this._map.offsetHeight * ratio) + "px";
+		}
+		mapWidth = this._map.offsetWidth;
+		mapHeight = this._map.offsetHeight;
+		if(mapHeight > maxHeight) {
+			var ratio = maxHeight / this._map.offsetHeight;
+			this._map.style.height = maxHeight + "px";
+			this._map.style.width = Math.round(this._map.offsetWidth * ratio) + "px";
+		}
+	}
+	,__class__: pmax_thumbnail_modules_ThumbnailMap
+});
+var pmax_thumbnail_modules_ThumbnailTimelapse = function(item) {
+	this._timelapseTime = 150;
+	this._timelapseTimer = null;
+	this._imagesBatchLoad = 7;
+	pmax_thumbnail_modules_ThumbnailModule.call(this,item);
+};
+pmax_thumbnail_modules_ThumbnailTimelapse.__name__ = true;
+pmax_thumbnail_modules_ThumbnailTimelapse.__super__ = pmax_thumbnail_modules_ThumbnailModule;
+pmax_thumbnail_modules_ThumbnailTimelapse.prototype = $extend(pmax_thumbnail_modules_ThumbnailModule.prototype,{
+	init: function() {
+		this._cont = window.document.createElement("span");
+		this._cont.style.width = "100%";
+		this._cont.style.height = "3px";
+		this._cont.style.background = "#A6D100";
+		this._cont.style.position = "absolute";
+		this._cont.style.bottom = "0";
+		this._cont.style.left = "0";
+		this.refresh();
+	}
+	,refresh: function() {
+		if(!this.get_running()) {
+			this._cont.style.display = "none";
+			return;
+		}
+		this._cont.style.display = "block";
+		var progressInTimelapse = this._timelapseIndex / (this._tmpLoadedImages.length - 1);
+		if(progressInTimelapse == 0) {
+			this._cont.style.removeProperty("transition");
+		} else {
+			this._cont.style.transition = "width " + this._timelapseTime + "ms linear";
+		}
+		this._cont.style.width = progressInTimelapse * 100 + "%";
+	}
+	,startTimelapse: function() {
+		if(this._timelapseTimer == null) {
+			this._originalImage = this._item.data.recentImage;
+			this._timelapseIndex = 0;
+			this._tmpLoadedImages = [];
+			this._timelapseLoadTimers = [];
+			if(this._item.image.getLoadedImages().length < this._item.data.dayImages.length) {
+				this.loadTimelapseImages();
+			}
+			this._item.image.stopAnimation();
+			this._timelapseTimer = new haxe_Timer(this._timelapseTime);
+			this._timelapseTimer.run = $bind(this,this.timelapseAction);
+		}
+	}
+	,stopTimelapse: function() {
+		this._timelapseTimer.stop();
+		this._timelapseTimer = null;
+		if(this._timelapseLoadTimers.length > 0) {
+			var _g = 0;
+			var _g1 = this._timelapseLoadTimers;
+			while(_g < _g1.length) {
+				var timer = _g1[_g];
+				++_g;
+				timer.stop();
+			}
+		}
+		this._item.image.showImage(this._originalImage.url);
+		this._item.image.startAnimation();
+		this._originalImage = null;
+		this.refresh();
+	}
+	,timelapseAction: function() {
+		if(this._timelapseIndex <= 1) {
+			this._tmpLoadedImages = this._item.image.getLoadedImages();
+			if(this._tmpLoadedImages.length <= 2) {
+				return;
+			}
+		}
+		if(this._timelapseIndex >= this._tmpLoadedImages.length) {
+			this._timelapseIndex = 0;
+		}
+		this._item.image.showImage(this._tmpLoadedImages[this._timelapseIndex],true);
+		this.refresh();
+		this._timelapseIndex++;
+	}
+	,loadTimelapseImages: function() {
+		var _gthis = this;
+		var imagesToLoad = this._imagesBatchLoad;
+		var imagesLength = this._item.data.dayImages.length;
+		var imageStep = Math.ceil(imagesLength / imagesToLoad);
+		var _g = 0;
+		var _g1 = imageStep;
+		while(_g < _g1) {
+			var i = _g++;
+			var batch = [imageStep - i - 1];
+			this._timelapseLoadTimers.push(haxe_Timer.delay((function(batch) {
+				return function() {
+					if(_gthis._timelapseTimer == null) {
+						return;
+					}
+					var _g = 0;
+					var _g1 = imagesLength;
+					while(_g < _g1) {
+						var i = _g++;
+						if(imagesLength <= imagesToLoad) {
+							_gthis._item.image.loadImage(_gthis._item.data.dayImages[i].url);
+						} else if(i % imageStep == batch[0]) {
+							_gthis._item.image.loadImage(_gthis._item.data.dayImages[i].url);
+						}
+					}
+				};
+			})(batch),500 * (imageStep - batch[0] - 1) + 1));
+		}
+	}
+	,get_running: function() {
+		return this._timelapseTimer != null;
+	}
+	,__class__: pmax_thumbnail_modules_ThumbnailTimelapse
+});
+function $getIterator(o) { if( o instanceof Array ) return new haxe_iterators_ArrayIterator(o); else return o.iterator(); }
+function $bind(o,m) { if( m == null ) return null; if( m.__id__ == null ) m.__id__ = $global.$haxeUID++; var f; if( o.hx__closures__ == null ) o.hx__closures__ = {}; else f = o.hx__closures__[m.__id__]; if( f == null ) { f = m.bind(o); o.hx__closures__[m.__id__] = f; } return f; }
+$global.$haxeUID |= 0;
+if(typeof(performance) != "undefined" ? typeof(performance.now) == "function" : false) {
+	HxOverrides.now = performance.now.bind(performance);
+}
+String.prototype.__class__ = String;
+String.__name__ = true;
+Array.__name__ = true;
+Date.prototype.__class__ = Date;
+Date.__name__ = "Date";
+var Int = { };
+var Dynamic = { };
+var Float = Number;
+var Bool = Boolean;
+var Class = { };
+var Enum = { };
+js_Boot.__toStr = ({ }).toString;
+msignal_SlotList.NIL = new msignal_SlotList(null,null);
+DateTools.DAY_SHORT_NAMES = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+DateTools.DAY_NAMES = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+DateTools.MONTH_SHORT_NAMES = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+DateTools.MONTH_NAMES = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+pmax_Pmax.version = "1.0.0";
+pmax_Pmax.versionNumber = 1000000;
+pmax_Pmax.apiUrl = "https://api.panomax.com/1.0";
+pmax_Pmax.staticUrl = "https://static.panomax.com/front/thumbnail";
+pmax_Pmax.failoverThumbnailImageBaseUrl = "https://panodata-alternate.panomax.com/cams";
+pmax_PmaxHelper._pmaxWindowKey = "PmaxThumbnailPmax";
+PmaxThumbnail.main();
+})(typeof window != "undefined" ? window : typeof global != "undefined" ? global : typeof self != "undefined" ? self : this);
+var PmaxGThumb = $hx_exports["PmaxGThumb"];
+var PmaxThumbnail = $hx_exports["PmaxThumbnail"];
+
+//# sourceMappingURL=pmaxthumbnail.js.map
