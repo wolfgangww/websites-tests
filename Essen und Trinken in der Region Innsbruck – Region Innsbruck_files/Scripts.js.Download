@@ -1,6 +1,0 @@
-jQuery(document).ready(function() {
-	jQuery('.lSRLiftsHeader').on('click touch',function() {
-		jQuery(this).toggleClass('active');
-		jQuery(this).next().slideToggle('fast');
-	});
-});
